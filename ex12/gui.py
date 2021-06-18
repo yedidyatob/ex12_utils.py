@@ -27,6 +27,7 @@ class GUI:
         self.buttons = dict()
         self.board = randomize_board()
         self.score = 0
+        self.guessed_words = []
         root.geometry("600x700")
         tk.Grid.rowconfigure(root, 0, weight=1)
         tk.Grid.rowconfigure(root, 1, weight=1)
@@ -76,8 +77,11 @@ class GUI:
     def check_word(self):
         words_list = readfile("boggle_dict.txt")
         if self.word in words_list:
-            self.update_score()
+            if self.word not in self.guessed_words:
+                self.guessed_words.append(self.word)
+                self.update_score()
         self.word = ""
+        self.word_label["text"] = self.word
         for (i, j) in self.buttons.keys():
             self.buttons[(i, j)].configure(background="light cyan")
 
@@ -95,7 +99,7 @@ class GUI:
 
         game_name = tk.Label(frame, text="Find all the words!",
                              background="LightBlue1", fg="blue4", font=("Snap ITC", 20))
-        self.word_label = tk.Label(frame, text=self.word, background="LightBlue1",
+        self.word_label = tk.Label(frame, background="LightBlue1",
                                    fg="blue4", font=("Comic Sans MS", 12))
         score_label = tk.Label(frame, text="SCORE:", background="LightBlue1", fg="blue4", font=("Comic Sans MS", 12))
         self.score_value = tk.Label(frame, background="LightBlue1", fg="blue4", font=("Comic Sans MS", 12))
