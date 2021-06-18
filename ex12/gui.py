@@ -17,10 +17,6 @@ def readfile(file):
     return words
 
 
-def randomize():
-    return randomize_board()
-
-
 class GUI:
     CELLS_IN_ROW = 4
     TOTAL_CELLS = 16
@@ -29,18 +25,24 @@ class GUI:
         self._root = root
         self.word = ""
         self.buttons = dict()
-        self.board = randomize()
+        self.board = randomize_board()
         self.score = 0
         root.geometry("600x700")
         tk.Grid.rowconfigure(root, 0, weight=1)
         tk.Grid.rowconfigure(root, 1, weight=1)
         tk.Grid.columnconfigure(root, 0, weight=1)
+        self.create_text_frame()
+        self.create_desk_frame()
+
+    def create_text_frame(self):
         self.text_frame = tk.Frame(root, background="LightBlue1")
-        self.desk_frame = tk.Frame(root, bd=20, background="LightBlue1")
         self.text_frame.grid(row=0, column=0, sticky="snew")
+        self._create_menu(self.text_frame)
+
+    def create_desk_frame(self):
+        self.desk_frame = tk.Frame(root, bd=20, background="LightBlue1")
         self.desk_frame.grid(row=1, column=0, sticky="snew")
         self._create_grid(self.desk_frame)
-        self._create_menu(self.text_frame)
 
     def _create_grid(self, frame):
         for i in range(self.CELLS_IN_ROW):
@@ -75,12 +77,13 @@ class GUI:
         words_list = readfile("boggle_dict.txt")
         if self.word in words_list:
             self.update_score()
-            self.word = ""
-            for (i, j) in self.buttons.keys():
-                self.buttons[(i, j)].configure(background="light cyan")
+        self.word = ""
+        for (i, j) in self.buttons.keys():
+            self.buttons[(i, j)].configure(background="light cyan")
 
     def refresh_board(self):
-        self.board = randomize()
+        self.desk_frame.destroy()
+        self.create_desk_frame()
 
     def _create_menu(self, frame):
         tk.Grid.rowconfigure(frame, 0, weight=1)
