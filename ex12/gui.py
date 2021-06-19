@@ -85,7 +85,10 @@ class GUI:
         pass
 
     def countdown(self, count):
-        self.timer["text"] = str(count) + " seconds left"
+        if len(str(count % 60)) == 1:
+            self.timer["text"] = str(count // 60) + ":" + "0" + str(count % 60)
+        else:
+            self.timer["text"] = str(count // 60) + ":" + str(count % 60)
         if count > 0:
             self._root.after(1000, self.countdown, count - 1)
 
