@@ -17,10 +17,8 @@ def readfile(file):
 
 class GUI:
     CELLS_IN_ROW = 4
-    TOTAL_CELLS = 16
 
     def __init__(self, root):
-        self._root = root
         self.word = ""
         self.word_dict = dict()
         self.buttons = dict()
@@ -28,23 +26,18 @@ class GUI:
         self.score = 0
         self.time_limit = 180
         self.guessed_words = []
-        root.geometry("600x610")
-        tk.Grid.rowconfigure(root, 0, weight=1)
-        tk.Grid.rowconfigure(root, 1, weight=1)
-        tk.Grid.columnconfigure(root, 0, weight=1)
-        self.create_text_frame()
-        self.create_desk_frame()
-        self.countdown(self.time_limit)
-
-    def create_text_frame(self):
-        self.text_frame = tk.Frame(self._root, background="LightBlue1")
+        self._root = root
+        self._root.geometry("600x750")
+        tk.Grid.rowconfigure(self._root, 0, weight=1)
+        tk.Grid.rowconfigure(self._root, 1, weight=1)
+        tk.Grid.columnconfigure(self._root, 0, weight=1)
+        self.text_frame = tk.Frame(self._root, height=150, width=600, background="LightBlue1")
         self.text_frame.grid(row=0, column=0, sticky="snew")
         self._create_menu(self.text_frame)
-
-    def create_desk_frame(self):
-        self.desk_frame = tk.Frame(self._root, bd=20, background="LightBlue1")
+        self.desk_frame = tk.Frame(self._root, height=600, width=600, bd=20, background="LightBlue1")
         self.desk_frame.grid(row=1, column=0, sticky="snew")
         self._create_grid(self.desk_frame)
+        self.countdown(self.time_limit)
 
     def _create_grid(self, frame):
         for i in range(self.CELLS_IN_ROW):
@@ -88,29 +81,31 @@ class GUI:
             self.buttons[(i, j)].configure(background="light cyan")
 
     def refresh_board(self):
-        #self.desk_frame.destroy()
-        #self.create_desk_frame()
+        # self.desk_frame.destroy()
+        # self.create_desk_frame()
         pass
 
     def countdown(self, count):
         self.timer["text"] = str(count)
         if count > 0:
             self._root.after(1000, self.countdown, count - 1)
-        #start_time = time.time()
-        #while True:
+        # start_time = time.time()
+        # while True:
         #    elapsed_time = time.time() - start_time
         #    self.timer["text"] = self.time_limit - int(elapsed_time)
         #    if elapsed_time > self.time_limit:
         #        self.timer["text"] = "Time is over!"
 
-
     def _create_menu(self, frame):
-        tk.Grid.rowconfigure(frame, 0, weight=1)
+        tk.Grid.rowconfigure(frame, 0, weight=3)
         tk.Grid.rowconfigure(frame, 1, weight=1)
-        tk.Grid.rowconfigure(frame, 2, weight=1)
+        tk.Grid.rowconfigure(frame, 2, weight=2)
+        tk.Grid.rowconfigure(frame, 3, weight=1)
         tk.Grid.columnconfigure(frame, 0, weight=1)
         tk.Grid.columnconfigure(frame, 1, weight=1)
         tk.Grid.columnconfigure(frame, 2, weight=1)
+        tk.Grid.columnconfigure(frame, 3, weight=1)
+        tk.Grid.columnconfigure(frame, 4, weight=1)
 
         game_name = tk.Label(frame, text="Find all the words!",
                              background="LightBlue1", fg="blue4", font=("Snap ITC", 20))
@@ -141,42 +136,41 @@ class Game:
     def __init__(self, root):
         self.root = root
         root.geometry("400x500")
+        tk.Grid.rowconfigure(self.root, 0, weight=1)
+        tk.Grid.columnconfigure(root, 0, weight=1)
+        self.main_frame = tk.Frame(self.root)
+        self.main_frame.grid(row=0, column=0, sticky="snew")
         self.create_window()
 
-    def clearwin(self):
-        for child in self.root.winfo_children():
-            child.destroy()
-
     def create_window(self):
-        tk.Grid.rowconfigure(self.root, 0, weight=1)
-        tk.Grid.rowconfigure(self.root, 1, weight=1)
-        tk.Grid.rowconfigure(self.root, 2, weight=1)
-        tk.Grid.columnconfigure(root, 0, weight=1)
+        tk.Grid.rowconfigure(self.main_frame, 0, weight=1)
+        tk.Grid.rowconfigure(self.main_frame, 1, weight=1)
+        tk.Grid.rowconfigure(self.main_frame, 2, weight=1)
+        tk.Grid.columnconfigure(self.main_frame, 0, weight=1)
 
-        name_label = tk.Frame(self.root, bd=20, background="LightBlue1")
-        name_label.grid(row=0, column=0, sticky="snew")
-        name = tk.Label(name_label, text="WELCOME\n TO\n BOGGLE!!!",
+        self.name_label = tk.Frame(self.main_frame, bd=20, background="LightBlue1")
+        self.name_label.grid(row=0, column=0, sticky="snew")
+        name = tk.Label(self.name_label, text="WELCOME\n TO\n BOGGLE!!!",
                         background="LightBlue1", fg="blue4", font=("Snap ITC", 20))
         name.place(x=65, y=30)
 
-        start_label = tk.Frame(self.root, bd=20, background="LightBlue1")
-        start_label.grid(row=1, column=0, sticky="snew")
-        start_button = tk.Button(start_label, text='START GAME', background="LightBlue1",
+        self.start_label = tk.Frame(self.main_frame, bd=20, background="LightBlue1")
+        self.start_label.grid(row=1, column=0, sticky="snew")
+        start_button = tk.Button(self.start_label, text='START GAME', background="LightBlue1",
                                  activebackground="PaleGreen1", command=self.start_game,
                                  fg="blue4", font=("Comic Sans MS", 15, "bold"))
         start_button.place(x=100, y=50)
 
-        exit_label = tk.Frame(self.root, bd=20, background="LightBlue1")
-        exit_label.grid(row=2, column=0, sticky="snew")
-        exit_button = tk.Button(exit_label, text='EXIT', background="LightBlue1",
-                                activebackground="PaleGreen1", command=lambda: self.root.destroy(),
+        self.exit_label = tk.Frame(self.main_frame, bd=20, background="LightBlue1")
+        self.exit_label.grid(row=2, column=0, sticky="snew")
+        exit_button = tk.Button(self.exit_label, text='EXIT', background="LightBlue1",
+                                activebackground="tomato", command=lambda: self.root.destroy(),
                                 fg="blue4", font=("Comic Sans MS", 15, "bold"))
         exit_button.place(x=135, y=50)
 
     def start_game(self):
-        self.clearwin()
+        self.main_frame.destroy()
         GUI(self.root)
-        return True
 
 
 if __name__ == "__main__":
