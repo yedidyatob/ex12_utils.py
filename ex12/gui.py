@@ -24,6 +24,7 @@ class GUI:
     def __init__(self, root):
         self._root = root
         self.word = ""
+        self.word_dict = dict()
         self.buttons = dict()
         self.board = randomize_board()
         self.score = 0
@@ -34,14 +35,15 @@ class GUI:
         tk.Grid.columnconfigure(root, 0, weight=1)
         self.create_text_frame()
         self.create_desk_frame()
+        self.countdown()
 
     def create_text_frame(self):
-        self.text_frame = tk.Frame(root, background="LightBlue1")
+        self.text_frame = tk.Frame(self._root, background="LightBlue1")
         self.text_frame.grid(row=0, column=0, sticky="snew")
         self._create_menu(self.text_frame)
 
     def create_desk_frame(self):
-        self.desk_frame = tk.Frame(root, bd=20, background="LightBlue1")
+        self.desk_frame = tk.Frame(self._root, bd=20, background="LightBlue1")
         self.desk_frame.grid(row=1, column=0, sticky="snew")
         self._create_grid(self.desk_frame)
 
@@ -54,21 +56,21 @@ class GUI:
                                    width=6, height=3, command=partial(self.button_action, i, j),
                                    font=("Comic Sans MS", 15, "bold"), relief=tk.GROOVE,
                                    background='mint cream', activebackground="LightBlue1", fg="blue4")
-                button.bind("<Button-3>", lambda event: self.undo_action(i, j))
                 button.grid(row=i, column=j, sticky="snew")
                 self.buttons[(i, j)] = button
+        for coordinates, button in self.buttons.items():
+            button.bind("<Double-1>", lambda event: self.undo_action(coordinates))
 
     def button_action(self, row, col):
         self.buttons[(row, col)].configure(background="PaleGreen1")
-        self.word += self.buttons[(row, col)]["text"]
+        if (row, col) not in self.word_dict.keys():
+            self.word_dict[(row, col)] = self.buttons[(row, col)]["text"]
+            self.word += self.buttons[(row, col)]["text"]
         self.word_label["text"] = self.word
 
     def undo_action(self, row, col):
-        self.buttons[(row, col)].configure(background="light cyan")
+        self.buttons[(row, col)].configure(background="LightBlue1")
         self.word.replace(self.buttons[(row, col)]["text"], "")
-
-    def countdown(self):
-        pass
 
     def update_score(self):
         self.score += int(len(self.word)) * 2
@@ -89,6 +91,9 @@ class GUI:
         self.desk_frame.destroy()
         self.create_desk_frame()
 
+    def countdown(self):
+        pass
+
     def _create_menu(self, frame):
         tk.Grid.rowconfigure(frame, 0, weight=1)
         tk.Grid.rowconfigure(frame, 1, weight=1)
@@ -102,7 +107,7 @@ class GUI:
         self.word_label = tk.Label(frame, background="LightBlue1",
                                    fg="blue4", font=("Comic Sans MS", 12))
         score_label = tk.Label(frame, text="SCORE:", background="LightBlue1", fg="blue4", font=("Comic Sans MS", 12))
-        self.score_value = tk.Label(frame, background="LightBlue1", fg="blue4", font=("Comic Sans MS", 12))
+        self.score_value = tk.Label(frame, text="0", background="LightBlue1", fg="blue4", font=("Comic Sans MS", 12))
         time_label = tk.Label(frame, background="LightBlue1", bitmap="hourglass", fg="blue4")
         check_word = tk.Button(frame, text='CHECK', background="LightBlue1",
                                activebackground="PaleGreen1", command=self.check_word,
@@ -110,21 +115,61 @@ class GUI:
         refresh = tk.Button(frame, text='REFRESH', background="LightBlue1",
                             activebackground="PaleGreen1", command=self.refresh_board,
                             fg="blue4", font=("Comic Sans MS", 10, "bold"))
-        # self.timer = tk.Label(frame, background="LightBlue1", font=("Franklin Gothic Medium", 10))
-
+        #self.timer = tk.Label(frame, background="LightBlue1", font=("Franklin Gothic Medium", 10))
         game_name.grid(row=0, column=1)
         score_label.grid(row=1, column=2)
         self.score_value.grid(row=1, column=3)
         time_label.grid(row=1, column=0)
-        # self.timer.grid(row=1, column=3)
+        #self.timer.grid(row=1, column=3)
         self.word_label.grid(row=1, column=1)
         check_word.grid(row=2, column=0)
         refresh.grid(row=2, column=2)
 
 
+class Game:
+    def __init__(self, root):
+        self.root = root
+        root.geometry("400x500")
+        self.create_window()
+
+    def clearwin(self):
+        for child in self.root.winfo_children():
+            child.destroy()
+
+    def create_window(self):
+        tk.Grid.rowconfigure(self.root, 0, weight=1)
+        tk.Grid.rowconfigure(self.root, 1, weight=1)
+        tk.Grid.rowconfigure(self.root, 2, weight=1)
+        tk.Grid.columnconfigure(root, 0, weight=1)
+
+        name_label = tk.Frame(self.root, bd=20, background="LightBlue1")
+        name_label.grid(row=0, column=0, sticky="snew")
+        name = tk.Label(name_label, text="WELCOME\n TO\n BOGGLE!!!",
+                        background="LightBlue1", fg="blue4", font=("Snap ITC", 20))
+        name.place(x=65, y=30)
+
+        start_label = tk.Frame(self.root, bd=20, background="LightBlue1")
+        start_label.grid(row=1, column=0, sticky="snew")
+        start_button = tk.Button(start_label, text='START GAME', background="LightBlue1",
+                                 activebackground="PaleGreen1", command=self.start_game,
+                                 fg="blue4", font=("Comic Sans MS", 15, "bold"))
+        start_button.place(x=100, y=50)
+
+        exit_label = tk.Frame(self.root, bd=20, background="LightBlue1")
+        exit_label.grid(row=2, column=0, sticky="snew")
+        exit_button = tk.Button(exit_label, text='EXIT', background="LightBlue1",
+                                activebackground="PaleGreen1", command=lambda: self.root.destroy(),
+                                fg="blue4", font=("Comic Sans MS", 15, "bold"))
+        exit_button.place(x=135, y=50)
+
+    def start_game(self):
+        self.clearwin()
+        GUI(self.root)
+        return True
+
+
 if __name__ == "__main__":
     root = tk.Tk()
-    root.geometry("500x500")
     root.wm_title("BOGGLE")
-    GUI(root)
+    Game(root)
     root.mainloop()
