@@ -1,7 +1,6 @@
 import tkinter as tk
 from functools import partial
 from boggle_board_randomizer import randomize_board
-import time
 
 
 def readfile(file):
@@ -86,15 +85,9 @@ class GUI:
         pass
 
     def countdown(self, count):
-        self.timer["text"] = str(count)
+        self.timer["text"] = str(count) + " seconds left"
         if count > 0:
             self._root.after(1000, self.countdown, count - 1)
-        # start_time = time.time()
-        # while True:
-        #    elapsed_time = time.time() - start_time
-        #    self.timer["text"] = self.time_limit - int(elapsed_time)
-        #    if elapsed_time > self.time_limit:
-        #        self.timer["text"] = "Time is over!"
 
     def _create_menu(self, frame):
         tk.Grid.rowconfigure(frame, 0, weight=3)
