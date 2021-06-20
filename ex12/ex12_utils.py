@@ -121,7 +121,6 @@ def helper_2(n, board, words, func):
     for path in paths:
         word = "".join(board[cell[0]][cell[1]] for cell in path)
         if word in words:
-            filtered.append((path_to_word(path, board), path))
             filtered.append(path)
     return filtered
 
