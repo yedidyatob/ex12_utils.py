@@ -19,7 +19,7 @@ class GUI:
 
     def __init__(self, root):
         self.word = ""
-        self.word_dict = dict()
+        self.path = []
         self.buttons = dict()
         self.board = randomize_board()
         self.score = 0
@@ -54,9 +54,8 @@ class GUI:
 
     def button_action(self, row, col):
         self.buttons[(row, col)].configure(background="PaleGreen1")
-        if (row, col) not in self.word_dict.keys():
-            self.word_dict[(row, col)] = self.buttons[(row, col)]["text"]
-            self.word += self.buttons[(row, col)]["text"]
+        self.path.append((row, col))
+        self.word += self.buttons[(row, col)]["text"]
         self.word_label["text"] = self.word
 
     def undo_action(self, row, col):
@@ -73,11 +72,11 @@ class GUI:
             if self.word not in self.guessed_words:
                 self.guessed_words.append(self.word)
                 self.update_score()
-        self.word_dict.clear()
+        self.path = []
         self.word = ""
         self.word_label["text"] = self.word
         for (i, j) in self.buttons.keys():
-            self.buttons[(i, j)].configure(background="light cyan")
+            self.buttons[(i, j)].configure(background="mint cream")
 
     def refresh_board(self):
         # self.desk_frame.destroy()
@@ -91,6 +90,11 @@ class GUI:
             self.timer["text"] = str(count // 60) + ":" + str(count % 60)
         if count > 0:
             self._root.after(1000, self.countdown, count - 1)
+        else:
+            self.end_game()
+
+    def end_game(self):
+        pass
 
     def _create_menu(self, frame):
         tk.Grid.rowconfigure(frame, 0, weight=3)

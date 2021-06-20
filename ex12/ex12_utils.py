@@ -149,17 +149,17 @@ if __name__ == '__main__':
     milon = open("boggle_dict.txt")
     lines = set(line.strip() for line in milon.readlines())
     pat = [(1, 3), (2, 3), (3, 3)]
-    # print(is_valid_path(bord1, pat, lines))
+    print(is_valid_path(bord1, pat, lines))
     print(find_length_n_paths(4, bord1, ["SPUE"]))
-    def test_does_not_split_cells():
-        board = [['Q', 'Q', 'Q', 'Q'],
-                 ['DO', 'GS', 'Q', 'Q'],
-                 ['Q', 'Q', 'Q', 'Q'],
-                 ['Q', 'Q', 'Q', 'Q']]
-        word_dict = {'DOG': True}
-        expected = []
-        assert find_length_n_words(2, board, word_dict) == expected
-    print(test_does_not_split_cells())
+    #def test_does_not_split_cells():
+    #    board = [['Q', 'Q', 'Q', 'Q'],
+    #             ['DO', 'GS', 'Q', 'Q'],
+    #            ['Q', 'Q', 'Q', 'Q'],
+    #             ['Q', 'Q', 'Q', 'Q']]
+    #    word_dict = {'DOG': True}
+    #    expected = []
+    #    assert find_length_n_words(2, board, word_dict) == expected
+    #print(test_does_not_split_cells())
 
 
 
