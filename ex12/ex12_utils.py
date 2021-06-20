@@ -27,7 +27,7 @@ def is_valid_path(board, path, words):
                 return
             word += board[cell[0]][cell[1]]
         if word in words:
-            return True
+            return word
 
 
 def board_to_dict(board):  # NOT IN USE
@@ -154,12 +154,12 @@ if __name__ == '__main__':
     lines_dic = {line[:-1]: 0 for line in lines}
     pat = [(1, 3), (2, 3), (3, 3)]
     # print(is_valid_path(bord1, pat, lines))
-    x = find_length_n_paths(15, bord, lines_dic)
+    x = find_length_n_paths(16, bord, lines_dic)
     print(len(x))
     end = time()
     print(end-start)
 
-    # print(is_valid_path(bord1, [(1,1), (1,1)], {"JJ": 0, "J": 0}))
+    print(is_valid_path(bord1, [(1,1), (1,1)], {"JJ": 0, "J": 0}))
 
 
 
