@@ -19,7 +19,7 @@ def is_valid_path(board, path, words):
     if path:
         for index, cell in enumerate(path):
             if index != 0:
-                if not is_neighbor(cell, path[index-1]):
+                if not is_neighbor(cell, path[index - 1]):
                     return  # check if path is continuous
             if cell in path[:index]:
                 return  # check if cell appears twice
@@ -84,7 +84,6 @@ def helper_1(n, cell, paths, board, words, func, path=None):
     new_word = path_to_word(new_path, board)
     length = len(new_word)
     new_words = {word: 0 for word in words if new_word in word[:length]}
-    # new_words = {word: 0 for word in words if word.startswith(new_word)}
     if new_words:
         last_added = len(get_content(cell, board))
         if (n == last_added and func == WORDS) \
@@ -135,38 +134,35 @@ def find_length_n_words(n, board, words):
     return helper_2(n, board, words, WORDS)
 
 
-
 def max_score_paths(board, words):
-    pass
+    all_paths = {}
+    longest = len(max(words, key=len))
+    for i in range(1, longest):
+        new_paths = {path_to_word(path, board): path for path in
+                     find_length_n_paths(i, board, words)}
+        for word in new_paths:
+            if word in all_paths:
+                if len(new_paths[word]) > len(all_paths[word]):
+                    all_paths[word] = new_paths[word]
+            else:
+                all_paths[word] = new_paths[word]
+    return list(all_paths.items())  # change to VALUES!!!!
 
 
 if __name__ == '__main__':
     bord = randomize_board(LETTERS)
-    bord1 = [['O', 'R', 'E', 'Y'],
-             ['E', 'J', 'N', 'H'],
-             ['H', 'E', 'U', 'P'],
-             ['F', 'S', 'S', 'E']]
-    pprint(bord)
-    start = time()
+    bord1 = [['D', 'C', 'B', 'A'],
+             ['G', 'A', 'D', 'E'],
+             ['T', 'J', 'Y', 'T'],
+             ['N', 'M', 'F', 'I']]
 
     milon = open("boggle_dict.txt")
     lines = milon.readlines()
     lines_dic = {line[:-1]: 0 for line in lines}
-    pat = [(1, 3), (2, 3), (3, 3)]
-    # print(is_valid_path(bord1, pat, lines))
-    x = find_length_n_paths(16, bord, lines_dic)
-    print(len(x))
+    start = time()
+    all_paths = []
+    pprint(bord)
+    print(max_score_paths(bord, lines_dic))
+    # find_length_n_paths(10, bord1, lines_dic)
     end = time()
-    print(end-start)
-
-    print(is_valid_path(bord1, [(1,1), (1,1)], {"JJ": 0, "J": 0}))
-
-
-
-
-
-
-
-
-
-
+    print(end - start)

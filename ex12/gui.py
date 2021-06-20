@@ -103,7 +103,7 @@ class GUI:
         tk.Grid.columnconfigure(frame, 3, weight=1)
         tk.Grid.columnconfigure(frame, 4, weight=1)
 
-        game_name = tk.Label(frame, text="Find all the words!",
+        game_name = tk.Label(frame, text="Find all_paths the words!",
                              background="LightBlue1", fg="blue4", font=("Snap ITC", 20))
         self.word_label = tk.Label(frame, background="LightBlue1",
                                    fg="blue4", font=("Comic Sans MS", 12))
