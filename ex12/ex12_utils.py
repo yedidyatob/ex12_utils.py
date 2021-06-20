@@ -84,15 +84,15 @@ def helper_1(n, cell, paths, board, words, func, path=None):
     new_word = path_to_word(new_path, board)
     new_words = [word for word in words if word.startswith(new_word)]
     if new_words:
-        for neighbor in all_neighbors(cell):
-            if neighbor in new_path or not is_legal_cell(neighbor, board):
-                continue
-            else:
-                last_added = len(get_content(cell, board))
-                if (n == last_added and func == WORDS) \
-                        or (n <= 1 and func == PATHS):
-                    if new_path not in paths:
-                        paths.append(new_path)
+        last_added = len(get_content(cell, board))
+        if (n == last_added and func == WORDS) \
+                or (n <= 1 and func == PATHS):
+            if new_path not in paths:
+                paths.append(new_path)
+        else:
+            for neighbor in all_neighbors(cell):
+                if neighbor in new_path or not is_legal_cell(neighbor, board):
+                    continue
                 else:
                     subtract = 1
                     if func == WORDS:
@@ -121,6 +121,7 @@ def helper_2(n, board, words, func):
     for path in paths:
         word = "".join(board[cell[0]][cell[1]] for cell in path)
         if word in words:
+            filtered.append((path_to_word(path, board), path))
             filtered.append(path)
     return filtered
 
@@ -140,28 +141,28 @@ def max_score_paths(board, words):
 
 if __name__ == '__main__':
     # bord = randomize_board(LETTERS)
-    bord1 = [['O', 'RE', 'E', 'Y'],
-             ['E', 'J', 'U', 'H'],
-             ['H', 'E', 'N', 'O'],
-             ['F', 'S', 'P', 'E']]
+    bord1 = [['O', 'R', 'E', 'Y'],
+             ['E', 'J', 'N', 'H'],
+             ['H', 'E', 'U', 'P'],
+             ['F', 'S', 'S', 'E']]
     pprint(bord1)
     start = time()
     milon = open("boggle_dict.txt")
     lines = set(line.strip() for line in milon.readlines())
     pat = [(1, 3), (2, 3), (3, 3)]
     # print(is_valid_path(bord1, pat, lines))
-    pats = find_length_n_paths(3, bord1, lines)
-    wrds = find_length_n_words(4, bord1, lines)
-    pats1 = [pat for pat in pats if len(path_to_word(pat, bord1)) == 4]
-    wrds1 = [wrd for wrd in wrds if "RE" in path_to_word(wrd, bord1)]
-    print(len(pats1))
-    print(len(wrds1))
-    for pat in pats:
-        print(path_to_word(pat, bord1))
-    print("words:")
-    for pat in wrds:
-        print(path_to_word(pat, bord1))
-    end = time()
-    print(end-start)
-    milon.close()
+    print(find_length_n_paths(4, bord1, ["SPUE"]))
+    def test_does_not_split_cells():
+        board = [['Q', 'Q', 'Q', 'Q'],
+                 ['DO', 'GS', 'Q', 'Q'],
+                 ['Q', 'Q', 'Q', 'Q'],
+                 ['Q', 'Q', 'Q', 'Q']]
+        word_dict = {'DOG': True}
+        expected = []
+        assert find_length_n_words(2, board, word_dict) == expected
+    print(test_does_not_split_cells())
+
+
+
+
 
