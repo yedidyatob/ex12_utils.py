@@ -82,7 +82,9 @@ def helper_1(n, cell, paths, board, words, func, path=None):
         path = []
     new_path = path[:] + [cell]
     new_word = path_to_word(new_path, board)
-    new_words = [word for word in words if word.startswith(new_word)]
+    length = len(new_word)
+    new_words = {word: 0 for word in words if new_word in word[:length]}
+    # new_words = {word: 0 for word in words if word.startswith(new_word)}
     if new_words:
         last_added = len(get_content(cell, board))
         if (n == last_added and func == WORDS) \
@@ -139,27 +141,30 @@ def max_score_paths(board, words):
 
 
 if __name__ == '__main__':
-    # bord = randomize_board(LETTERS)
+    bord = randomize_board(LETTERS)
     bord1 = [['O', 'R', 'E', 'Y'],
              ['E', 'J', 'N', 'H'],
              ['H', 'E', 'U', 'P'],
              ['F', 'S', 'S', 'E']]
-    pprint(bord1)
+    pprint(bord)
     start = time()
+
     milon = open("boggle_dict.txt")
-    lines = set(line.strip() for line in milon.readlines())
+    lines = milon.readlines()
+    lines_dic = {line[:-1]: 0 for line in lines}
     pat = [(1, 3), (2, 3), (3, 3)]
     # print(is_valid_path(bord1, pat, lines))
-    print(find_length_n_paths(4, bord1, ["SPUE"]))
-    def test_does_not_split_cells():
-        board = [['Q', 'Q', 'Q', 'Q'],
-                 ['DO', 'GS', 'Q', 'Q'],
-                 ['Q', 'Q', 'Q', 'Q'],
-                 ['Q', 'Q', 'Q', 'Q']]
-        word_dict = {'DOG': True}
-        expected = []
-        assert find_length_n_words(2, board, word_dict) == expected
-    print(test_does_not_split_cells())
+    x = find_length_n_paths(15, bord, lines_dic)
+    print(len(x))
+    end = time()
+    print(end-start)
+
+    # print(is_valid_path(bord1, [(1,1), (1,1)], {"JJ": 0, "J": 0}))
+
+
+
+
+
 
 
 
