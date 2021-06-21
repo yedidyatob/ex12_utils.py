@@ -81,18 +81,16 @@ class MainGame:
                                    background='mint cream', activebackground="LightBlue1", fg="blue4")
                 button.grid(row=i, column=j, sticky="snew")
                 self.buttons[(i, j)] = button
-        for coordinates, button in self.buttons.items():
-            button.bind("<Double-1>", lambda event: self.undo_action(coordinates[0], coordinates[1]))
 
     def button_action(self, row, col):
+        curr_path = self.path.append((row, col))
+        #if utils.is_valid_path(self.board, curr_path, self.words_list):
         self.buttons[(row, col)].configure(background="PaleGreen1")
         self.path.append((row, col))
         self.word += self.buttons[(row, col)]["text"]
         self.word_label["text"] = self.word
-
-    def undo_action(self, row, col):
-        self.buttons[(row, col)].configure(background="mint cream")
-        self.word.replace(self.buttons[(row, col)]["text"], "")
+        #else:
+        #self.buttons[(row, col)].configure(activebackground="tomato")
 
     def update_score(self):
         self.score += int(len(self.word)) * 2
@@ -182,8 +180,8 @@ class EndGame:
         self.end_game()
 
     def end_game(self):
-        info_frame = tk.Frame( self.main_frame, background="LightBlue1")
-        info_frame.grid(row=0,column=0, sticky="snew")
+        info_frame = tk.Frame(self.main_frame, background="LightBlue1")
+        info_frame.grid(row=0, column=0, sticky="snew")
 
         tk.Grid.rowconfigure(info_frame, 0, weight=1)
         tk.Grid.columnconfigure(info_frame, 0, weight=1)
@@ -214,7 +212,7 @@ class EndGame:
         again_button.grid(row=3, column=0)
 
         menu_button = tk.Button(self.main_frame, text='EXIT', background="LightBlue1",
-                                activebackground="PaleGreen1", command=lambda: self.root.destroy(),
+                                activebackground="tomato", command=lambda: self.root.destroy(),
                                 fg="blue4", font=("Comic Sans MS", 12, "bold"))
         menu_button.grid(row=3, column=1)
 
