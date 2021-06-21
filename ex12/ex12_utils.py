@@ -140,6 +140,17 @@ def max_score_paths(board, words):
     pass
 
 
+def readfile(file):
+    words = []
+    f_words = open(file)
+    for line in f_words:
+        word = line.strip()
+        if word.isalpha():
+            words.append(line.strip())
+    f_words.close()
+    return words
+
+
 if __name__ == '__main__':
     bord = randomize_board(LETTERS)
     bord1 = [['O', 'R', 'E', 'Y'],
@@ -159,7 +170,7 @@ if __name__ == '__main__':
     end = time()
     print(end-start)
 
-    print(is_valid_path(bord1, [(1,1), (1,1)], {"JJ": 0, "J": 0}))
+    print(is_valid_path(bord1, [(0,0), (2,2)], {"JJ": 0, "J": 0}))
 
 
 
