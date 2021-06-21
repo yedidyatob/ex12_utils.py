@@ -54,7 +54,7 @@ class MainGame:
         self.buttons = dict()
         self.board = randomize_board()
         self.score = 0
-        self.time_limit = 10
+        self.time_limit = 180
         self.words_list = utils.readfile("boggle_dict.txt")
         self.guessed_words = []
         self._root = root
