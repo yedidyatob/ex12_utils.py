@@ -54,7 +54,7 @@ class MainGame:
         self.buttons = dict()
         self.board = randomize_board()
         self.score = 0
-        self.time_limit = 180
+        self.time_limit = 20
         self.words_list = utils.readfile("boggle_dict.txt")
         self.guessed_words = []
         self._root = root
@@ -67,15 +67,15 @@ class MainGame:
         self._create_menu(self.text_frame)
         self.desk_frame = tk.Frame(self._root, height=600, width=600, bd=20, background="LightBlue1")
         self.desk_frame.grid(row=1, column=0, sticky="snew")
-        self._create_grid(self.desk_frame)
+        self._create_grid(self.desk_frame, self.board)
         self.countdown(self.time_limit)
 
-    def _create_grid(self, frame):
+    def _create_grid(self, frame, board):
         for i in range(self.CELLS_IN_ROW):
             tk.Grid.rowconfigure(frame, i, weight=1)
             for j in range(self.CELLS_IN_ROW):
                 tk.Grid.columnconfigure(frame, j, weight=1)
-                button = tk.Button(frame, text=self.board[i][j],
+                button = tk.Button(frame, text=board[i][j],
                                    width=6, height=3, command=partial(self.button_action, i, j),
                                    font=("Comic Sans MS", 15, "bold"), relief=tk.GROOVE,
                                    background='mint cream', activebackground="LightBlue1", fg="blue4")
@@ -108,9 +108,10 @@ class MainGame:
             self.buttons[(i, j)].configure(background="light cyan")
 
     def refresh_board(self):
-        # self.desk_frame.destroy()
-        # self.create_desk_frame()
-        pass
+        self.desk_frame.destroy()
+        self.desk_frame = tk.Frame(self._root, height=600, width=600, bd=20, background="LightBlue1")
+        self.desk_frame.grid(row=1, column=0, sticky="snew")
+        self._create_grid(self.desk_frame, utils.randomize_board())
 
     def countdown(self, count):
         if count > 0:
