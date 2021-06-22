@@ -100,6 +100,7 @@ class MainGame:
         if self.word in self.words_list:
             if self.word not in self.guessed_words:
                 self.guessed_words.append(self.word)
+                self.words.insert(tk.END, self.word + " ")
                 self.update_score()
         self.path = []
         self.word = ""
@@ -112,6 +113,7 @@ class MainGame:
         self.desk_frame = tk.Frame(self._root, height=600, width=600, bd=20, background="LightBlue1")
         self.desk_frame.grid(row=1, column=0, sticky="snew")
         self._create_grid(self.desk_frame, utils.randomize_board())
+        self.word_label["text"] = ""
 
     def countdown(self, count):
         if count > 0:
@@ -151,6 +153,9 @@ class MainGame:
                             activebackground="PaleGreen1", command=self.refresh_board,
                             fg="blue4", font=("Comic Sans MS", 10, "bold"))
         self.timer = tk.Label(frame, background="LightBlue1", fg="blue4", font=("Comic Sans MS", 12))
+        self.words = tk.Text(frame,
+                             bg="LightBlue1", fg="blue4", font=("Comic Sans MS", 15), wrap=tk.WORD,
+                             relief=tk.SUNKEN, width=20, height=3)
 
         game_name.grid(row=0, column=2)
         time_label.grid(row=1, column=0)
@@ -159,6 +164,7 @@ class MainGame:
         self.score_value.grid(row=1, column=4)
         self.word_label.grid(row=2, column=2)
         check_word.grid(row=3, column=1)
+        self.words.grid(row=3, column=2)
         refresh.grid(row=3, column=3)
 
 
@@ -198,7 +204,7 @@ class EndGame:
 
         words = tk.Text(self.main_frame,
                         bg="LightBlue1", fg="blue4", font=("Comic Sans MS", 15),
-                        relief=tk.FLAT, width=20, height=3)
+                        relief=tk.FLAT, width=20, height=3, wrap=tk.WORD)
         words.insert(tk.END, self.guessed_words)
         words.grid(row=1, column=1)
 
