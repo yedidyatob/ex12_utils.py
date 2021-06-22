@@ -121,7 +121,6 @@ class MainGame:
                 self.timer["text"] = str(count // 60) + ":" + str(count % 60)
             self._root.after(1000, self.countdown, count - 1)
         else:
-            self.word_label["text"] = "Time is up!"
             for child in self._root.winfo_children():
                 child.destroy()
             EndGame(self._root, self.guessed_words, self.score)
