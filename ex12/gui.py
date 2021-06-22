@@ -77,7 +77,7 @@ class MainGame:
                 tk.Grid.columnconfigure(frame, j, weight=1)
                 button = tk.Button(frame, text=board[i][j],
                                    width=6, height=3, command=partial(self.button_action, i, j),
-                                   font=("Comic Sans MS", 15, "bold"), relief=tk.GROOVE,
+                                   font=("Comic Sans MS", 15, "bold"), relief=tk.GROOVE, cursor="tcross",
                                    background='mint cream', activebackground="LightBlue1", fg="blue4")
                 button.grid(row=i, column=j, sticky="snew")
                 self.buttons[(i, j)] = button
@@ -158,7 +158,7 @@ class MainGame:
         self.timer = tk.Label(frame, background="LightBlue1", fg="blue4", font=("Comic Sans MS", 12))
         self.words = tk.Text(frame,
                              bg="LightBlue1", fg="blue4", font=("Comic Sans MS", 15), wrap=tk.WORD,
-                             relief=tk.SUNKEN, state=tk.DISABLED, width=25, height=3)
+                             relief=tk.SUNKEN, width=32, height=4)
 
         game_name.grid(row=0, column=2)
         time_label.grid(row=1, column=0)
@@ -207,7 +207,7 @@ class EndGame:
 
         words = tk.Text(self.main_frame,
                         bg="LightBlue1", fg="blue4", font=("Comic Sans MS", 15),
-                        relief=tk.FLAT, width=20, height=3, wrap=tk.WORD)
+                        relief=tk.SUNKEN, width=25, height=4, wrap=tk.WORD)
         words.insert(tk.END, self.guessed_words)
         words.grid(row=1, column=1)
 
