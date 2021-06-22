@@ -87,13 +87,13 @@ class MainGame:
 
     def button_action(self, row, col):
         curr_path = self.path.append((row, col))
-        #if utils.is_valid_path(self.board, curr_path, self.words_list):
+        # if utils.is_valid_path(self.board, curr_path, self.words_list):
         self.buttons[(row, col)].configure(background="PaleGreen1")
         self.path.append((row, col))
         self.word += self.buttons[(row, col)]["text"]
         self.word_label["text"] = self.word
-        #else:
-        #self.buttons[(row, col)].configure(activebackground="tomato")
+        # else:
+        # self.buttons[(row, col)].configure(activebackground="tomato")
 
     def update_score(self):
         self.score += int(len(self.word)) * 2
@@ -168,6 +168,7 @@ class EndGame:
     def __init__(self, root, guessed_words, score):
         self.root = root
         self.guessed_words = guessed_words
+        print(self.guessed_words)
         self.score = score
         root.geometry("600x750")
         tk.Grid.rowconfigure(self.root, 0, weight=1)
@@ -197,8 +198,10 @@ class EndGame:
                                  background="LightBlue1", fg="blue4", font=("Comic Sans MS", 15))
         words_guessed.grid(row=1, column=0)
 
-        words = tk.Label(self.main_frame, text=self.guessed_words,
-                         background="LightBlue1", fg="blue4", font=("Comic Sans MS", 15))
+        words = tk.Text(self.main_frame,
+                        bg="LightBlue1", fg="blue4", font=("Comic Sans MS", 15),
+                        relief=tk.FLAT, width=20, height=3)
+        words.insert(tk.END, self.guessed_words)
         words.grid(row=1, column=1)
 
         final_score = tk.Label(self.main_frame, text="FINAL SCORE: ",
