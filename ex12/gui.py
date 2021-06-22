@@ -83,14 +83,10 @@ class MainGame:
                 self.buttons[(i, j)] = button
 
     def button_action(self, row, col):
-        curr_path = self.path.append((row, col))
-        # if utils.is_valid_path(self.board, curr_path, self.words_list):
         self.buttons[(row, col)].configure(background="PaleGreen1")
         self.path.append((row, col))
         self.word += self.buttons[(row, col)]["text"]
         self.word_label["text"] = self.word
-        # else:
-        # self.buttons[(row, col)].configure(activebackground="tomato")
 
     def update_score(self):
         self.score += int(len(self.word)) * 2
