@@ -82,6 +82,12 @@ class MainGame:
                 button.grid(row=i, column=j, sticky="snew")
                 self.buttons[(i, j)] = button
 
+    def undo_action(self, row, col):
+        self.buttons[(row, col)].configure(background="mint cream")
+        self.path.pop()
+        self.word.replace(self.buttons[(row, col)]["text"], "")
+        self.word_label["text"] = self.word
+
     def button_action(self, row, col):
         if (row, col) not in self.path:
             if not self.path or utils.is_neighbor((row, col), self.path[-1]):
@@ -152,7 +158,7 @@ class MainGame:
         self.timer = tk.Label(frame, background="LightBlue1", fg="blue4", font=("Comic Sans MS", 12))
         self.words = tk.Text(frame,
                              bg="LightBlue1", fg="blue4", font=("Comic Sans MS", 15), wrap=tk.WORD,
-                             relief=tk.SUNKEN, width=25, height=3)
+                             relief=tk.SUNKEN, state=tk.DISABLED, width=25, height=3)
 
         game_name.grid(row=0, column=2)
         time_label.grid(row=1, column=0)
