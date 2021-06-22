@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="662328d5-2944-4743-ae7c-424f3fd6cbd8" name="Default Changelist" comment="מילים לא נשברות ומופיעות במהלך המשחק" />
+    <list default="true" id="662328d5-2944-4743-ae7c-424f3fd6cbd8" name="Default Changelist" comment="מילים לא נשברות ומופיעות במהלך המשחק">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ex12/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/ex12/gui.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -302,7 +305,28 @@
       <option name="project" value="LOCAL" />
       <updated>1624354289822</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="מילים לא נשברות ומופיעות במהלך המשחק">
+      <created>1624354508947</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1624354508947</updated>
+    </task>
+    <task id="LOCAL-00023" summary="מילים לא נשברות ומופיעות במהלך המשחק">
+      <created>1624354538325</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1624354538325</updated>
+    </task>
+    <task id="LOCAL-00024" summary="מילים לא נשברות ומופיעות במהלך המשחק">
+      <created>1624354546477</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1624354546477</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

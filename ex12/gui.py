@@ -83,10 +83,12 @@ class MainGame:
                 self.buttons[(i, j)] = button
 
     def button_action(self, row, col):
-        self.buttons[(row, col)].configure(background="PaleGreen1")
-        self.path.append((row, col))
-        self.word += self.buttons[(row, col)]["text"]
-        self.word_label["text"] = self.word
+        if (row, col) not in self.path:
+            if not self.path or utils.is_neighbor((row, col), self.path[-1]):
+                self.buttons[(row, col)].configure(background="PaleGreen1")
+                self.path.append((row, col))
+                self.word += self.buttons[(row, col)]["text"]
+                self.word_label["text"] = self.word
 
     def update_score(self):
         self.score += int(len(self.word)) * 2
