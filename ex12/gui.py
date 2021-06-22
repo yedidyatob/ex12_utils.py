@@ -47,6 +47,9 @@ class StartGame:
 
 class MainGame:
     CELLS_IN_ROW = 4
+    TIME_CHANGE = 1000
+    TIME_UP = "Time is up!"
+    TIME_LIMIT = 180
 
     def __init__(self, root):
         self.word = ""
@@ -54,7 +57,7 @@ class MainGame:
         self.buttons = dict()
         self.board = randomize_board()
         self.score = 0
-        self.time_limit = 20
+        self.time_limit = self.TIME_LIMIT
         self.words_list = utils.readfile("boggle_dict.txt")
         self.guessed_words = []
         self._root = root
@@ -67,15 +70,15 @@ class MainGame:
         self._create_menu(self.text_frame)
         self.desk_frame = tk.Frame(self._root, height=600, width=600, bd=20, background="LightBlue1")
         self.desk_frame.grid(row=1, column=0, sticky="snew")
-        self._create_grid(self.desk_frame, self.board)
+        self._create_grid(self.desk_frame)
         self.countdown(self.time_limit)
 
-    def _create_grid(self, frame, board):
+    def _create_grid(self, frame):
         for i in range(self.CELLS_IN_ROW):
             tk.Grid.rowconfigure(frame, i, weight=1)
             for j in range(self.CELLS_IN_ROW):
                 tk.Grid.columnconfigure(frame, j, weight=1)
-                button = tk.Button(frame, text=board[i][j],
+                button = tk.Button(frame, text=self.board[i][j],
                                    width=6, height=3, command=partial(self.button_action, i, j),
                                    font=("Comic Sans MS", 15, "bold"), relief=tk.GROOVE,
                                    background='mint cream', activebackground="LightBlue1", fg="blue4")
@@ -108,10 +111,9 @@ class MainGame:
             self.buttons[(i, j)].configure(background="light cyan")
 
     def refresh_board(self):
-        self.desk_frame.destroy()
-        self.desk_frame = tk.Frame(self._root, height=600, width=600, bd=20, background="LightBlue1")
-        self.desk_frame.grid(row=1, column=0, sticky="snew")
-        self._create_grid(self.desk_frame, utils.randomize_board())
+        # self.desk_frame.destroy()
+        # self.create_desk_frame()
+        pass
 
     def countdown(self, count):
         if count > 0:
@@ -119,9 +121,9 @@ class MainGame:
                 self.timer["text"] = str(count // 60) + ":" + "0" + str(count % 60)
             else:
                 self.timer["text"] = str(count // 60) + ":" + str(count % 60)
-            self._root.after(1000, self.countdown, count - 1)
+            self._root.after(self.TIME_CHANGE, self.countdown, count - 1)
         else:
-            self.word_label["text"] = "Time is up!"
+            self.word_label["text"] = self.TIME_UP
             for child in self._root.winfo_children():
                 child.destroy()
             EndGame(self._root, self.guessed_words, self.score)
@@ -137,7 +139,7 @@ class MainGame:
         tk.Grid.columnconfigure(frame, 3, weight=1)
         tk.Grid.columnconfigure(frame, 4, weight=1)
 
-        game_name = tk.Label(frame, text="Find all the words!",
+        game_name = tk.Label(frame, text="Find all_paths the words!",
                              background="LightBlue1", fg="blue4", font=("Snap ITC", 20))
         self.word_label = tk.Label(frame, background="LightBlue1",
                                    fg="blue4", font=("Comic Sans MS", 12))
