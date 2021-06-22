@@ -47,6 +47,9 @@ class StartGame:
 
 class MainGame:
     CELLS_IN_ROW = 4
+    TIME_CHANGE = 1000
+    TIME_UP = "Time is up!"
+    TIME_LIMIT = 180
 
     def __init__(self, root):
         self.word = ""
@@ -54,7 +57,7 @@ class MainGame:
         self.buttons = dict()
         self.board = randomize_board()
         self.score = 0
-        self.time_limit = 10
+        self.time_limit = self.TIME_LIMIT
         self.words_list = utils.readfile("boggle_dict.txt")
         self.guessed_words = []
         self._root = root
@@ -118,9 +121,9 @@ class MainGame:
                 self.timer["text"] = str(count // 60) + ":" + "0" + str(count % 60)
             else:
                 self.timer["text"] = str(count // 60) + ":" + str(count % 60)
-            self._root.after(1000, self.countdown, count - 1)
+            self._root.after(self.TIME_CHANGE, self.countdown, count - 1)
         else:
-            self.word_label["text"] = "Time is up!"
+            self.word_label["text"] = self.TIME_UP
             for child in self._root.winfo_children():
                 child.destroy()
             EndGame(self._root, self.guessed_words, self.score)
