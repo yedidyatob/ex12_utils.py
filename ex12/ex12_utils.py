@@ -2,6 +2,8 @@ from boggle_board_randomizer import LETTERS, randomize_board
 from pprint import pprint
 from time import time
 
+
+
 SIZE = 4
 PATHS = 1
 WORDS = 2

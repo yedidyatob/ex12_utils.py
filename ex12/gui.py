@@ -127,9 +127,12 @@ class MainGame:
                 self.timer["text"] = str(count // 60) + ":" + str(count % 60)
             self._root.after(1000, self.countdown, count - 1)
         else:
-            for child in self._root.winfo_children():
-                child.destroy()
-            EndGame(self._root, self.guessed_words, self.score)
+            self.endgame()
+
+    def endgame(self):
+        for child in self._root.winfo_children():
+            child.destroy()
+        EndGame(self._root, self.guessed_words, self.score)
 
     def _create_menu(self, frame):
         tk.Grid.rowconfigure(frame, 0, weight=3)
