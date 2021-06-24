@@ -55,7 +55,7 @@ class MainGame:
         self.buttons = dict()
         self.board = randomize_board()
         self.score = 0
-        self.time_limit = 10
+        self.time_limit = 180
         self.words_list = utils.readfile("boggle_dict.txt")
         self.guessed_words = []
         self._root = root
@@ -205,7 +205,7 @@ class EndGame:
         self.end_game()
 
     def end_game(self):
-        info_frame = tk.Frame(self.main_frame, background="LightBlue1")
+        info_frame = tk.Frame(self.main_frame, height=150, width=600, background="LightBlue1")
         info_frame.grid(row=0, column=0, sticky="snew")
 
         tk.Grid.rowconfigure(info_frame, 0, weight=1)
@@ -215,7 +215,7 @@ class EndGame:
                              background="LightBlue1", fg="blue4", font=("Snap ITC", 30))
         game_over.grid(row=0, column=0, sticky="snew")
 
-        results_frame = tk.Frame(self.main_frame, background="LightBlue1")
+        results_frame = tk.Frame(self.main_frame, height=600, width=600, background="LightBlue1")
         results_frame.grid(row=1, column=0, sticky="snew")
 
         tk.Grid.rowconfigure(results_frame, 0, weight=1)
