@@ -10,10 +10,16 @@ class StartGame:
     and exit from the game
     """
     START_GEOMETRY = "400x500"
+    BACKGROUND = "LightBlue1"
+    NAME_FONT = ("Snap ITC", 20)
+    MAIN_FONT = ("Comic Sans MS", 15, "bold")
+    POS_ACTIVE = "PaleGreen1"
+    NEG_ACTIVE = "tomato"
+
     def __init__(self, root):
         self.root = root
         # define the size of the window
-        root.geometry("400x500")
+        root.geometry(self.START_GEOMETRY)
 
         tk.Grid.rowconfigure(self.root, 0, weight=1)
         tk.Grid.columnconfigure(root, 0, weight=1)
@@ -37,24 +43,24 @@ class StartGame:
         tk.Grid.rowconfigure(self.main_frame, 2, weight=1)
         tk.Grid.columnconfigure(self.main_frame, 0, weight=1)
 
-        self.name_label = tk.Frame(self.main_frame, bd=20, background="LightBlue1")
+        self.name_label = tk.Frame(self.main_frame, bd=20, background=self.BACKGROUND)
         self.name_label.grid(row=0, column=0, sticky="snew")
         name = tk.Label(self.name_label, text="WELCOME\n TO\n BOGGLE!!!",
-                        background="LightBlue1", fg="blue4", font=("Snap ITC", 20))
+                        background=self.BACKGROUND, fg="blue4", font=self.NAME_FONT)
         name.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
-        self.start_label = tk.Frame(self.main_frame, bd=20, background="LightBlue1")
+        self.start_label = tk.Frame(self.main_frame, bd=20, background=self.BACKGROUND)
         self.start_label.grid(row=1, column=0, sticky="snew")
-        start_button = tk.Button(self.start_label, text='START GAME', background="LightBlue1",
-                                 activebackground="PaleGreen1", command=self.start_game,
-                                 fg="blue4", font=("Comic Sans MS", 15, "bold"))
+        start_button = tk.Button(self.start_label, text='START GAME', background=self.BACKGROUND,
+                                 activebackground=self.POS_ACTIVE, command=self.start_game,
+                                 fg="blue4", font=self.MAIN_FONT)
         start_button.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
-        self.exit_label = tk.Frame(self.main_frame, bd=20, background="LightBlue1")
+        self.exit_label = tk.Frame(self.main_frame, bd=20, background=self.BACKGROUND)
         self.exit_label.grid(row=2, column=0, sticky="snew")
-        exit_button = tk.Button(self.exit_label, text='EXIT', background="LightBlue1",
-                                activebackground="tomato", command=lambda: self.root.destroy(),
-                                fg="blue4", font=("Comic Sans MS", 15, "bold"))
+        exit_button = tk.Button(self.exit_label, text='EXIT', background=self.BACKGROUND,
+                                activebackground=self.NEG_ACTIVE, command=lambda: self.root.destroy(),
+                                fg="blue4", font=self.MAIN_FONT)
         exit_button.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
     def start_game(self):
@@ -77,6 +83,16 @@ class MainGame:
     """
     # constants defined
     CELLS_IN_ROW = 4
+    GAME_GEOMETRY = "600x750"
+    BUTTON_BACKGROUND = "mint cream"
+    BACKGROUND = "LightBlue1"
+    NAME_FONT = ("Snap ITC", 20)
+    MAIN_FONT = ("Comic Sans MS", 15, "bold")
+    FONT = ("Comic Sans MS", 12)
+    POS_ACTIVE = "PaleGreen1"
+    NEG_ACTIVE = "tomato"
+    CLICKED_COLOR = "PaleGreen1"
+    FOREGROUND = "blue4"
 
     def __init__(self, root):
 
@@ -91,18 +107,18 @@ class MainGame:
 
         self._root = root
         # initialise root size
-        self._root.geometry("600x750")
+        self._root.geometry(self.GAME_GEOMETRY)
 
         tk.Grid.rowconfigure(self._root, 0, weight=1)
         tk.Grid.rowconfigure(self._root, 1, weight=1)
         tk.Grid.columnconfigure(self._root, 0, weight=1)
 
-        self.text_frame = tk.Frame(self._root, height=150, width=600, background="LightBlue1")
+        self.text_frame = tk.Frame(self._root, height=150, width=600, background=self.BACKGROUND)
         self.text_frame.grid(row=0, column=0, sticky="snew")
         # call to create info widgets
         self._create_menu(self.text_frame)
 
-        self.desk_frame = tk.Frame(self._root, height=600, width=600, bd=20, background="LightBlue1")
+        self.desk_frame = tk.Frame(self._root, height=600, width=600, bd=20, background=self.BACKGROUND)
         self.desk_frame.grid(row=1, column=0, sticky="snew")
         # call to create buttons grid
         self._create_grid(self.desk_frame, self.board)
@@ -125,8 +141,8 @@ class MainGame:
                 tk.Grid.columnconfigure(frame, j, weight=1)
                 button = tk.Button(frame, text=board[i][j],
                                    width=6, height=3, command=partial(self.button_action, i, j),
-                                   font=("Comic Sans MS", 15, "bold"), relief=tk.GROOVE, cursor="tcross",
-                                   background='mint cream', fg="blue4")
+                                   font=self.MAIN_FONT, relief=tk.GROOVE, cursor="tcross",
+                                   background=self.BUTTON_BACKGROUND, fg=self.FOREGROUND)
                 button.bind("<Button-3>", partial(self.undo_action, i, j))
                 button.grid(row=i, column=j, sticky="snew")
                 self.buttons[(i, j)] = button
@@ -143,7 +159,7 @@ class MainGame:
         if self.path:
             # if current coordinates are last in path
             if (row, col) == self.path[-1]:
-                self.buttons[(row, col)].configure(background="mint cream")
+                self.buttons[(row, col)].configure(background=self.BUTTON_BACKGROUND)
                 self.path.pop()
                 self.word = self.word[:-1]
                 self.word_label["text"] = self.word
@@ -160,7 +176,7 @@ class MainGame:
         if (row, col) not in self.path:
             # if the button clicked is valid
             if not self.path or utils.is_neighbor((row, col), self.path[-1]):
-                self.buttons[(row, col)].configure(background="PaleGreen1")
+                self.buttons[(row, col)].configure(background=self.CLICKED_COLOR)
                 self.path.append((row, col))
                 self.word += self.buttons[(row, col)]["text"]
                 self.word_label["text"] = self.word
@@ -176,9 +192,9 @@ class MainGame:
             # if the button is valid
             if (not self.path or utils.is_neighbor(coordinate, self.path[-1]))\
                     and coordinate not in self.path:
-                button.configure(activebackground="LightBlue1")
+                button.configure(activebackground=self.POS_ACTIVE)
             else:
-                button.configure(activebackground="tomato")
+                button.configure(activebackground=self.NEG_ACTIVE)
 
     def update_score(self):
         """
@@ -209,7 +225,7 @@ class MainGame:
         self.word_label["text"] = self.word
         # update background for buttons
         for (i, j) in self.buttons.keys():
-            self.buttons[(i, j)].configure(background="mint cream")
+            self.buttons[(i, j)].configure(background=self.BUTTON_BACKGROUND)
         self.active_background()
 
     def refresh_board(self):
@@ -220,7 +236,7 @@ class MainGame:
         """
         self.desk_frame.destroy()
         # create board
-        self.desk_frame = tk.Frame(self._root, height=600, width=600, bd=20, background="LightBlue1")
+        self.desk_frame = tk.Frame(self._root, height=600, width=600, bd=20, background=self.BACKGROUND)
         self.desk_frame.grid(row=1, column=0, sticky="snew")
         # update path and word if refreshed
         self.path = []
@@ -278,21 +294,21 @@ class MainGame:
         tk.Grid.columnconfigure(frame, 4, weight=1)
 
         game_name = tk.Label(frame, text="Find all the words!",
-                             background="LightBlue1", fg="blue4", font=("Snap ITC", 20))
-        self.word_label = tk.Label(frame, background="LightBlue1",
-                                   fg="blue4", font=("Comic Sans MS", 12))
-        score_label = tk.Label(frame, text="SCORE:", background="LightBlue1", fg="blue4", font=("Comic Sans MS", 12))
-        self.score_value = tk.Label(frame, text="0", background="LightBlue1", fg="blue4", font=("Comic Sans MS", 12))
-        time_label = tk.Label(frame, background="LightBlue1", bitmap="hourglass", fg="blue4")
-        check_word = tk.Button(frame, text='CHECK', background="LightBlue1",
-                               activebackground="PaleGreen1", command=self.check_word,
-                               fg="blue4", font=("Comic Sans MS", 10, "bold"))
-        refresh = tk.Button(frame, text='REFRESH', background="LightBlue1",
-                            activebackground="PaleGreen1", command=self.refresh_board,
-                            fg="blue4", font=("Comic Sans MS", 10, "bold"))
-        self.timer = tk.Label(frame, background="LightBlue1", fg="blue4", font=("Comic Sans MS", 12))
+                             background=self.BACKGROUND, fg=self.FOREGROUND, font=self.NAME_FONT)
+        self.word_label = tk.Label(frame, background=self.BACKGROUND,
+                                   fg=self.FOREGROUND, font=self.FONT)
+        score_label = tk.Label(frame, text="SCORE:", background=self.BACKGROUND, fg=self.FOREGROUND, font=self.FONT)
+        self.score_value = tk.Label(frame, text="0", background=self.BACKGROUND, fg=self.FOREGROUND, font=self.FONT)
+        time_label = tk.Label(frame, background=self.BACKGROUND, bitmap="hourglass", fg=self.FOREGROUND)
+        check_word = tk.Button(frame, text='CHECK', background=self.BACKGROUND,
+                               activebackground=self.POS_ACTIVE, command=self.check_word,
+                               fg=self.FOREGROUND, font=self.FONT)
+        refresh = tk.Button(frame, text='REFRESH', background=self.BACKGROUND,
+                            activebackground=self.POS_ACTIVE, command=self.refresh_board,
+                            fg=self.FOREGROUND, font=self.FONT)
+        self.timer = tk.Label(frame, background=self.BACKGROUND, fg=self.FOREGROUND, font=self.FONT)
         self.words = tk.Text(frame,
-                             bg="LightBlue1", fg="blue4", font=("Comic Sans MS", 12), wrap=tk.WORD,
+                             bg=self.BACKGROUND, fg=self.FOREGROUND, font=self.FONT, wrap=tk.WORD,
                              relief=tk.SUNKEN, width=35, height=4, state=tk.DISABLED)
 
         game_name.grid(row=0, column=2)
@@ -310,15 +326,18 @@ class EndGame:
     """
     The class that implements final menu in the current window
     """
+    BACKGROUND = "LightBlue1"
+    END_GEOMETRY = "600x750"
+
     def __init__(self, root, guessed_words, score):
         self.root = root
         self.guessed_words = guessed_words
         self.score = score
         # initialise root size
-        root.geometry("600x750")
+        root.geometry(self.END_GEOMETRY)
         tk.Grid.rowconfigure(self.root, 0, weight=1)
         tk.Grid.columnconfigure(self.root, 0, weight=1)
-        self.main_frame = tk.Frame(self.root, background="LightBlue1")
+        self.main_frame = tk.Frame(self.root, background=self.BACKGROUND)
         self.main_frame.pack(expand=1, fill=tk.BOTH)
         tk.Grid.rowconfigure(self.main_frame, 0, weight=1)
         tk.Grid.rowconfigure(self.main_frame, 1, weight=1)
