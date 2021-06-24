@@ -79,14 +79,17 @@ class MainGame:
                                    width=6, height=3, command=partial(self.button_action, i, j),
                                    font=("Comic Sans MS", 15, "bold"), relief=tk.GROOVE, cursor="tcross",
                                    background='mint cream', activebackground="LightBlue1", fg="blue4")
+                button.bind("<Button-3>", partial(self.undo_action, i, j))
                 button.grid(row=i, column=j, sticky="snew")
                 self.buttons[(i, j)] = button
 
-    def undo_action(self, row, col):
-        self.buttons[(row, col)].configure(background="mint cream")
-        self.path.pop()
-        self.word.replace(self.buttons[(row, col)]["text"], "")
-        self.word_label["text"] = self.word
+    def undo_action(self, row, col, event=None):
+        if self.path:
+            if (row, col) == self.path[-1]:
+                self.buttons[(row, col)].configure(background="mint cream")
+                self.path.pop()
+                self.word = self.word[:-1]
+                self.word_label["text"] = self.word
 
     def button_action(self, row, col):
         if (row, col) not in self.path:
