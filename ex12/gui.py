@@ -55,7 +55,7 @@ class MainGame:
         self.buttons = dict()
         self.board = randomize_board()
         self.score = 0
-        self.time_limit = 180
+        self.time_limit = 10
         self.words_list = utils.readfile("boggle_dict.txt")
         self.guessed_words = []
         self._root = root
@@ -105,7 +105,6 @@ class MainGame:
 
     def active_background(self):
         for coordinate, button in self.buttons.items():
-            print(self.path)
             if (not self.path or utils.is_neighbor(coordinate, self.path[-1]))\
                     and coordinate not in self.path:
                 button.configure(activebackground="LightBlue1")
@@ -202,10 +201,7 @@ class EndGame:
         self.main_frame.pack(expand=1, fill=tk.BOTH)
         tk.Grid.rowconfigure(self.main_frame, 0, weight=1)
         tk.Grid.rowconfigure(self.main_frame, 1, weight=1)
-        tk.Grid.rowconfigure(self.main_frame, 2, weight=1)
-        tk.Grid.rowconfigure(self.main_frame, 3, weight=1)
         tk.Grid.columnconfigure(self.main_frame, 0, weight=1)
-        tk.Grid.columnconfigure(self.main_frame, 1, weight=1)
         self.end_game()
 
     def end_game(self):
@@ -217,35 +213,44 @@ class EndGame:
 
         game_over = tk.Label(info_frame, text="GAME OVER!",
                              background="LightBlue1", fg="blue4", font=("Snap ITC", 30))
-        game_over.grid(row=0, column=1)
+        game_over.grid(row=0, column=0, sticky="snew")
 
-        words_guessed = tk.Label(self.main_frame, text="WORDS GUESSED: ",
+        results_frame = tk.Frame(self.main_frame, background="LightBlue1")
+        results_frame.grid(row=1, column=0, sticky="snew")
+
+        tk.Grid.rowconfigure(results_frame, 0, weight=1)
+        tk.Grid.rowconfigure(results_frame, 1, weight=1)
+        tk.Grid.rowconfigure(results_frame, 2, weight=1)
+        tk.Grid.columnconfigure(results_frame, 0, weight=1)
+        tk.Grid.columnconfigure(results_frame, 1, weight=1)
+
+        words_guessed = tk.Label(results_frame, text="WORDS GUESSED: ",
                                  background="LightBlue1", fg="blue4", font=("Comic Sans MS", 15))
-        words_guessed.grid(row=1, column=0)
+        words_guessed.grid(row=0, column=0)
 
-        words = tk.Text(self.main_frame,
+        words = tk.Text(results_frame,
                         bg="LightBlue1", fg="blue4", font=("Comic Sans MS", 12),
                         relief=tk.SUNKEN, width=40, height=4, wrap=tk.WORD)
         words.insert(tk.END, self.guessed_words)
-        words.grid(row=1, column=1)
+        words.grid(row=0, column=1)
 
-        final_score = tk.Label(self.main_frame, text="FINAL SCORE: ",
+        final_score = tk.Label(results_frame, text="FINAL SCORE: ",
                                background="LightBlue1", fg="blue4", font=("Comic Sans MS", 15))
-        final_score.grid(row=2, column=0)
+        final_score.grid(row=1, column=0)
 
-        score = tk.Label(self.main_frame, text=str(self.score),
+        score = tk.Label(results_frame, text=str(self.score),
                          background="LightBlue1", fg="blue4", font=("Comic Sans MS", 15))
-        score.grid(row=2, column=1)
+        score.grid(row=1, column=1)
 
-        again_button = tk.Button(self.main_frame, text='PLAY AGAIN', background="LightBlue1",
+        again_button = tk.Button(results_frame, text='PLAY AGAIN', background="LightBlue1",
                                  activebackground="PaleGreen1", command=self.run_again,
                                  fg="blue4", font=("Comic Sans MS", 12, "bold"))
-        again_button.grid(row=3, column=0)
+        again_button.grid(row=2, column=0)
 
-        menu_button = tk.Button(self.main_frame, text='EXIT', background="LightBlue1",
+        menu_button = tk.Button(results_frame, text='EXIT', background="LightBlue1",
                                 activebackground="tomato", command=lambda: self.root.destroy(),
                                 fg="blue4", font=("Comic Sans MS", 12, "bold"))
-        menu_button.grid(row=3, column=1)
+        menu_button.grid(row=2, column=1)
 
     def run_again(self):
         self.main_frame.destroy()
