@@ -55,7 +55,7 @@ class MainGame:
         self.buttons = dict()
         self.board = randomize_board()
         self.score = 0
-        self.time_limit = 180
+        self.time_limit = 60
         self.words_list = utils.readfile("boggle_dict.txt")
         self.guessed_words = []
         self._root = root
@@ -119,20 +119,27 @@ class MainGame:
         if self.word in self.words_list:
             if self.word not in self.guessed_words:
                 self.guessed_words.append(self.word)
+                self.words.configure(state=tk.NORMAL)
                 self.words.insert(tk.END, self.word + " ")
+                self.words.configure(state=tk.DISABLED)
+
                 self.update_score()
         self.path = []
         self.word = ""
         self.word_label["text"] = self.word
         for (i, j) in self.buttons.keys():
-            self.buttons[(i, j)].configure(background="light cyan")
+            self.buttons[(i, j)].configure(background="mint cream")
+        self.active_background()
 
     def refresh_board(self):
         self.desk_frame.destroy()
         self.desk_frame = tk.Frame(self._root, height=600, width=600, bd=20, background="LightBlue1")
         self.desk_frame.grid(row=1, column=0, sticky="snew")
+        self.path = []
+        self.word = ""
         self._create_grid(self.desk_frame, utils.randomize_board())
         self.word_label["text"] = ""
+        self.active_background()
 
     def countdown(self, count):
         if count > 0:
@@ -174,18 +181,18 @@ class MainGame:
                             activebackground="PaleGreen1", command=self.refresh_board,
                             fg="blue4", font=("Comic Sans MS", 10, "bold"))
         self.timer = tk.Label(frame, background="LightBlue1", fg="blue4", font=("Comic Sans MS", 12))
+
         self.words = tk.Text(frame,
                              bg="LightBlue1", fg="blue4", font=("Comic Sans MS", 12), wrap=tk.WORD,
-                             relief=tk.SUNKEN, width=40, height=4)
-
+                             relief=tk.SUNKEN, width=40, height=4, state=tk.DISABLED)
         game_name.grid(row=0, column=2)
         time_label.grid(row=1, column=0)
         self.timer.grid(row=1, column=1)
         score_label.grid(row=1, column=3)
         self.score_value.grid(row=1, column=4)
         self.word_label.grid(row=2, column=2)
-        check_word.grid(row=3, column=1)
         self.words.grid(row=3, column=2)
+        check_word.grid(row=3, column=1)
         refresh.grid(row=3, column=3)
 
 
