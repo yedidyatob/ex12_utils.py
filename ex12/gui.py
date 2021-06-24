@@ -69,6 +69,7 @@ class MainGame:
         self.desk_frame.grid(row=1, column=0, sticky="snew")
         self._create_grid(self.desk_frame, self.board)
         self.countdown(self.time_limit)
+        self.active_background()
 
     def _create_grid(self, frame, board):
         for i in range(self.CELLS_IN_ROW):
@@ -78,7 +79,7 @@ class MainGame:
                 button = tk.Button(frame, text=board[i][j],
                                    width=6, height=3, command=partial(self.button_action, i, j),
                                    font=("Comic Sans MS", 15, "bold"), relief=tk.GROOVE, cursor="tcross",
-                                   background='mint cream', activebackground="LightBlue1", fg="blue4")
+                                   background='mint cream', fg="blue4")
                 button.bind("<Button-3>", partial(self.undo_action, i, j))
                 button.grid(row=i, column=j, sticky="snew")
                 self.buttons[(i, j)] = button
@@ -98,6 +99,15 @@ class MainGame:
                 self.path.append((row, col))
                 self.word += self.buttons[(row, col)]["text"]
                 self.word_label["text"] = self.word
+                self.active_background()
+
+    def active_background(self):
+        for coordinate, button in self.buttons.items():
+            if (not self.path or utils.is_neighbor(coordinate, self.path[-1]))\
+                    and coordinate not in self.path:
+                button.configure(activebackground="LightBlue1")
+            else:
+                button.configure(activebackground="tomato")
 
     def update_score(self):
         self.score += int(len(self.word)) * 2
