@@ -181,7 +181,6 @@ class EndGame:
     def __init__(self, root, guessed_words, score):
         self.root = root
         self.guessed_words = guessed_words
-        print(self.guessed_words)
         self.score = score
         root.geometry("600x750")
         tk.Grid.rowconfigure(self.root, 0, weight=1)
@@ -212,8 +211,8 @@ class EndGame:
         words_guessed.grid(row=1, column=0)
 
         words = tk.Text(self.main_frame,
-                        bg="LightBlue1", fg="blue4", font=("Comic Sans MS", 15),
-                        relief=tk.SUNKEN, width=25, height=4, wrap=tk.WORD)
+                        bg="LightBlue1", fg="blue4", font=("Comic Sans MS", 12),
+                        relief=tk.SUNKEN, width=40, height=4, wrap=tk.WORD)
         words.insert(tk.END, self.guessed_words)
         words.grid(row=1, column=1)
 
