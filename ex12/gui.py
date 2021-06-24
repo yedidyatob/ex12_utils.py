@@ -160,8 +160,8 @@ class MainGame:
                             fg="blue4", font=("Comic Sans MS", 10, "bold"))
         self.timer = tk.Label(frame, background="LightBlue1", fg="blue4", font=("Comic Sans MS", 12))
         self.words = tk.Text(frame,
-                             bg="LightBlue1", fg="blue4", font=("Comic Sans MS", 15), wrap=tk.WORD,
-                             relief=tk.SUNKEN, width=32, height=4)
+                             bg="LightBlue1", fg="blue4", font=("Comic Sans MS", 12), wrap=tk.WORD,
+                             relief=tk.SUNKEN, width=40, height=4)
 
         game_name.grid(row=0, column=2)
         time_label.grid(row=1, column=0)
