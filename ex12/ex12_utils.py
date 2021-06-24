@@ -148,18 +148,21 @@ def max_score_paths(board, words):
                     all_paths[word] = new_paths[word]
             else:
                 all_paths[word] = new_paths[word]
-    return list(all_paths.items())  # change to VALUES!!!!
+    return list(all_paths.values())
 
 
 def readfile(file):
     words = []
+
     f_words = open(file)
-    for line in f_words:
-        word = line.strip()
-        if word.isalpha():
-            words.append(line.strip())
+    lines = f_words.readlines()
+    lines_dic = {line[:-1]: 0 for line in lines}
+    # for line in f_words:
+    #     word = line.strip()
+    #     if word.isalpha():
+    #         words.append(line.strip())
     f_words.close()
-    return words
+    return lines_dic
 
 
 if __name__ == '__main__':
@@ -180,13 +183,6 @@ if __name__ == '__main__':
     end = time()
 
     print(end-start)
-
-    print(is_valid_path(bord1, [(0,0), (2,2)], {"JJ": 0, "J": 0}))
-
-
-
-
-
 
 
 

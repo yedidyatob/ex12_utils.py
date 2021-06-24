@@ -5,6 +5,7 @@ from boggle_board_randomizer import randomize_board
 
 
 class StartGame:
+    START_GEOMETRY = "400x500"
     def __init__(self, root):
         self.root = root
         root.geometry("400x500")
@@ -91,6 +92,7 @@ class MainGame:
                 self.path.pop()
                 self.word = self.word[:-1]
                 self.word_label["text"] = self.word
+                self.active_background()
 
     def button_action(self, row, col):
         if (row, col) not in self.path:
@@ -103,6 +105,7 @@ class MainGame:
 
     def active_background(self):
         for coordinate, button in self.buttons.items():
+            print(self.path)
             if (not self.path or utils.is_neighbor(coordinate, self.path[-1]))\
                     and coordinate not in self.path:
                 button.configure(activebackground="LightBlue1")
