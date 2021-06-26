@@ -328,6 +328,11 @@ class EndGame:
     """
     BACKGROUND = "LightBlue1"
     END_GEOMETRY = "600x750"
+    NAME_FONT = ("Snap ITC", 30)
+    MAIN_FONT = ("Comic Sans MS", 15, "bold")
+    POS_ACTIVE = "PaleGreen1"
+    NEG_ACTIVE = "tomato"
+    FOREGROUND = "blue4"
 
     def __init__(self, root, guessed_words, score):
         self.root = root
@@ -358,10 +363,10 @@ class EndGame:
         tk.Grid.columnconfigure(info_frame, 0, weight=1)
 
         game_over = tk.Label(info_frame, text="GAME OVER!",
-                             background="LightBlue1", fg="blue4", font=("Snap ITC", 30))
+                             background=self.BACKGROUND, fg=self.FOREGROUND, font=self.NAME_FONT)
         game_over.grid(row=0, column=0, sticky="snew")
 
-        results_frame = tk.Frame(self.main_frame, height=600, width=600, background="LightBlue1")
+        results_frame = tk.Frame(self.main_frame, height=600, width=600, background=self.BACKGROUND)
         results_frame.grid(row=1, column=0, sticky="snew")
 
         tk.Grid.rowconfigure(results_frame, 0, weight=1)
@@ -371,7 +376,7 @@ class EndGame:
         tk.Grid.columnconfigure(results_frame, 1, weight=1)
 
         words_guessed = tk.Label(results_frame, text="WORDS GUESSED: ",
-                                 background="LightBlue1", fg="blue4", font=("Comic Sans MS", 15))
+                                 background=self.BACKGROUND, fg=self.FOREGROUND, font=self.MAIN_FONT)
         words_guessed.grid(row=0, column=0)
 
         words = tk.Text(results_frame,
