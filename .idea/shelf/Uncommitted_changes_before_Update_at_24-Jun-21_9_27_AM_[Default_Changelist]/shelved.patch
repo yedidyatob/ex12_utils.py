@@ -1,0 +1,590 @@
+Index: ex12/ex12_utils.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from boggle_board_randomizer import LETTERS, randomize_board\r\nfrom pprint import pprint\r\nfrom time import time\r\n\r\nSIZE = 4\r\nPATHS = 1\r\nWORDS = 2\r\n\r\n\r\ndef is_valid_path(board, path, words):\r\n    \"\"\"\r\n\r\n    :param board:\r\n    :param path:\r\n    :param words:\r\n    :return:\r\n    \"\"\"\r\n    word = \"\"\r\n    if path:\r\n        for index, cell in enumerate(path):\r\n            if index != 0:\r\n                if not is_neighbor(cell, path[index - 1]):\r\n                    return  # check if path is continuous\r\n            if cell in path[:index]:\r\n                return  # check if cell appears twice\r\n            if not is_legal_cell(cell, board):\r\n                return\r\n            word += board[cell[0]][cell[1]]\r\n        if word in words:\r\n            return word\r\n\r\n\r\ndef board_to_dict(board):  # NOT IN USE\r\n    board_dict = {(i, j): board[i][j] for i in range(SIZE) for j in range(SIZE)}\r\n    return board_dict\r\n\r\n\r\ndef is_legal_cell(cell, board):\r\n    \"\"\"\r\n\r\n    :param board:\r\n    :param cell:\r\n    :return:\r\n    \"\"\"\r\n    max_index = len(board) - 1\r\n    for i in cell:\r\n        if not 0 <= i <= max_index:\r\n            return False\r\n    return True\r\n\r\n\r\ndef get_content(cell, board):\r\n    if is_legal_cell(cell, board):\r\n        return board[cell[0]][cell[1]]\r\n\r\n\r\ndef is_neighbor(cell1, cell2):\r\n    \"\"\"\r\n    ASSUMES CELLS ARE LEGAL! DOES NOT CHECK IF CELLS ARE VALID.\r\n    checks if cells are neighbors (in 8 directions).\r\n    :param cell1: tuple\r\n    :param cell2: tuple\r\n    :return: bool\r\n    \"\"\"\r\n\r\n    for i in range(2):\r\n        if abs(cell1[i] - cell2[i]) > 1:\r\n            return False\r\n    if cell2 != cell1:\r\n        return True\r\n\r\n\r\ndef all_neighbors(cell):\r\n    moves = [-1, 0, 1]\r\n    neighbors = [(cell[0] + i, cell[1] + j) for i in moves for j in moves]\r\n    neighbors.remove(cell)\r\n    return neighbors\r\n\r\n\r\ndef helper_1(n, cell, paths, board, words, func, path=None):\r\n    if not path:\r\n        path = []\r\n    new_path = path[:] + [cell]\r\n    new_word = path_to_word(new_path, board)\r\n    length = len(new_word)\r\n    new_words = {word: 0 for word in words if new_word in word[:length]}\r\n    if new_words:\r\n        last_added = len(get_content(cell, board))\r\n        if (n == last_added and func == WORDS) \\\r\n                or (n <= 1 and func == PATHS):\r\n            if new_path not in paths:\r\n                paths.append(new_path)\r\n        else:\r\n            for neighbor in all_neighbors(cell):\r\n                if neighbor in new_path or not is_legal_cell(neighbor, board):\r\n                    continue\r\n                else:\r\n                    subtract = 1\r\n                    if func == WORDS:\r\n                        subtract = last_added\r\n                    helper_1(n - subtract, neighbor, paths,\r\n                             board, new_words, func, new_path)\r\n\r\n\r\ndef path_to_word(path, board):\r\n    \"\"\"\r\n\r\n    :param path:\r\n    :param board:\r\n    :return:\r\n    \"\"\"\r\n    return \"\".join(board[cell[0]][cell[1]] for cell in path)\r\n\r\n\r\ndef helper_2(n, board, words, func):\r\n    paths = []\r\n    for i in range(SIZE):\r\n        for j in range(SIZE):\r\n            cell = (i, j)\r\n            helper_1(n, cell, paths, board, words, func)\r\n    filtered = []\r\n    for path in paths:\r\n        word = \"\".join(board[cell[0]][cell[1]] for cell in path)\r\n        if word in words:\r\n            filtered.append(path)\r\n    return filtered\r\n\r\n\r\ndef find_length_n_paths(n, board, words):\r\n    return helper_2(n, board, words, PATHS)\r\n\r\n\r\ndef find_length_n_words(n, board, words):\r\n    return helper_2(n, board, words, WORDS)\r\n\r\n\r\ndef max_score_paths(board, words):\r\n    all_paths = {}\r\n    longest = len(max(words, key=len))\r\n    for i in range(1, longest):\r\n        new_paths = {path_to_word(path, board): path for path in\r\n                     find_length_n_paths(i, board, words)}\r\n        for word in new_paths:\r\n            if word in all_paths:\r\n                if len(new_paths[word]) > len(all_paths[word]):\r\n                    all_paths[word] = new_paths[word]\r\n            else:\r\n                all_paths[word] = new_paths[word]\r\n    return list(all_paths.items())  # change to VALUES!!!!\r\n\r\n\r\ndef readfile(file):\r\n    words = []\r\n    f_words = open(file)\r\n    for line in f_words:\r\n        word = line.strip()\r\n        if word.isalpha():\r\n            words.append(line.strip())\r\n    f_words.close()\r\n    return words\r\n\r\n\r\nif __name__ == '__main__':\r\n    bord = randomize_board(LETTERS)\r\n    bord1 = [['D', 'C', 'B', 'A'],\r\n             ['G', 'A', 'D', 'E'],\r\n             ['T', 'J', 'Y', 'T'],\r\n             ['N', 'M', 'F', 'I']]\r\n\r\n    milon = open(\"boggle_dict.txt\")\r\n    lines = milon.readlines()\r\n    lines_dic = {line[:-1]: 0 for line in lines}\r\n    start = time()\r\n    all_paths = []\r\n    pprint(bord)\r\n    print(max_score_paths(bord, lines_dic))\r\n    # find_length_n_paths(10, bord1, lines_dic)\r\n    end = time()\r\n\r\n    print(end-start)\r\n\r\n    print(is_valid_path(bord1, [(0,0), (2,2)], {\"JJ\": 0, \"J\": 0}))\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/ex12/ex12_utils.py b/ex12/ex12_utils.py
+--- a/ex12/ex12_utils.py	(revision 418c60db4ad3412a510703b9c9042c9616aabbfc)
++++ b/ex12/ex12_utils.py	(date 1624364510202)
+@@ -146,7 +146,7 @@
+                     all_paths[word] = new_paths[word]
+             else:
+                 all_paths[word] = new_paths[word]
+-    return list(all_paths.items())  # change to VALUES!!!!
++    return list(all_paths.values())
+ 
+ 
+ def readfile(file):
+@@ -179,13 +179,6 @@
+ 
+     print(end-start)
+ 
+-    print(is_valid_path(bord1, [(0,0), (2,2)], {"JJ": 0, "J": 0}))
+-
+-
+-
+-
+-
+-
+ 
+ 
+ 
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+new file mode 100644
+--- /dev/null	(date 1624364451237)
++++ b/.idea/misc.xml	(date 1624364451237)
+@@ -0,0 +1,4 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.8" project-jdk-type="Python SDK" />
++</project>
+\ No newline at end of file
+Index: .idea/inspectionProfiles/profiles_settings.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/inspectionProfiles/profiles_settings.xml b/.idea/inspectionProfiles/profiles_settings.xml
+new file mode 100644
+--- /dev/null	(date 1624364451256)
++++ b/.idea/inspectionProfiles/profiles_settings.xml	(date 1624364451256)
+@@ -0,0 +1,6 @@
++<component name="InspectionProjectProfileManager">
++  <settings>
++    <option name="USE_PROJECT_PROFILE" value="false" />
++    <version value="1.0" />
++  </settings>
++</component>
+\ No newline at end of file
+Index: .idea/vcs.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/vcs.xml b/.idea/vcs.xml
+new file mode 100644
+--- /dev/null	(date 1624364451273)
++++ b/.idea/vcs.xml	(date 1624364451273)
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="VcsDirectoryMappings">
++    <mapping directory="$PROJECT_DIR$" vcs="Git" />
++  </component>
++</project>
+\ No newline at end of file
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"662328d5-2944-4743-ae7c-424f3fd6cbd8\" name=\"Default Changelist\" comment=\"מילים לא נשברות ומופיעות במהלך המשחק\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/ex12/gui.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/ex12/gui.py\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Python Script\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"PUSH_AUTO_UPDATE\" value=\"true\" />\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"ProjectId\" id=\"1u4AFy8YJ8iOEKKzhv2URIeiWtl\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">\r\n    <property name=\"RunOnceActivity.OpenProjectViewOnStart\" value=\"true\" />\r\n    <property name=\"RunOnceActivity.ShowReadmeOnStart\" value=\"true\" />\r\n    <property name=\"last_opened_file_path\" value=\"$PROJECT_DIR$/../ex4\" />\r\n  </component>\r\n  <component name=\"RunManager\" selected=\"Python.gui\">\r\n    <configuration name=\"check\" type=\"PythonConfigurationType\" factoryName=\"Python\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"ex12_utils.py\" />\r\n      <option name=\"INTERPRETER_OPTIONS\" value=\"\" />\r\n      <option name=\"PARENT_ENVS\" value=\"true\" />\r\n      <envs>\r\n        <env name=\"PYTHONUNBUFFERED\" value=\"1\" />\r\n      </envs>\r\n      <option name=\"SDK_HOME\" value=\"\" />\r\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$/ex12\" />\r\n      <option name=\"IS_MODULE_SDK\" value=\"true\" />\r\n      <option name=\"ADD_CONTENT_ROOTS\" value=\"true\" />\r\n      <option name=\"ADD_SOURCE_ROOTS\" value=\"true\" />\r\n      <option name=\"SCRIPT_NAME\" value=\"$PROJECT_DIR$/ex12/check.py\" />\r\n      <option name=\"PARAMETERS\" value=\"\" />\r\n      <option name=\"SHOW_COMMAND_LINE\" value=\"false\" />\r\n      <option name=\"EMULATE_TERMINAL\" value=\"false\" />\r\n      <option name=\"MODULE_MODE\" value=\"false\" />\r\n      <option name=\"REDIRECT_INPUT\" value=\"false\" />\r\n      <option name=\"INPUT_FILE\" value=\"\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"ex12_utils\" type=\"PythonConfigurationType\" factoryName=\"Python\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"ex12_utils.py\" />\r\n      <option name=\"INTERPRETER_OPTIONS\" value=\"\" />\r\n      <option name=\"PARENT_ENVS\" value=\"true\" />\r\n      <envs>\r\n        <env name=\"PYTHONUNBUFFERED\" value=\"1\" />\r\n      </envs>\r\n      <option name=\"SDK_HOME\" value=\"\" />\r\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$/ex12\" />\r\n      <option name=\"IS_MODULE_SDK\" value=\"true\" />\r\n      <option name=\"ADD_CONTENT_ROOTS\" value=\"true\" />\r\n      <option name=\"ADD_SOURCE_ROOTS\" value=\"true\" />\r\n      <option name=\"SCRIPT_NAME\" value=\"$PROJECT_DIR$/ex12/ex12_utils.py\" />\r\n      <option name=\"PARAMETERS\" value=\"\" />\r\n      <option name=\"SHOW_COMMAND_LINE\" value=\"false\" />\r\n      <option name=\"EMULATE_TERMINAL\" value=\"false\" />\r\n      <option name=\"MODULE_MODE\" value=\"false\" />\r\n      <option name=\"REDIRECT_INPUT\" value=\"false\" />\r\n      <option name=\"INPUT_FILE\" value=\"\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"example\" type=\"PythonConfigurationType\" factoryName=\"Python\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"ex12_utils.py\" />\r\n      <option name=\"INTERPRETER_OPTIONS\" value=\"\" />\r\n      <option name=\"PARENT_ENVS\" value=\"true\" />\r\n      <envs>\r\n        <env name=\"PYTHONUNBUFFERED\" value=\"1\" />\r\n      </envs>\r\n      <option name=\"SDK_HOME\" value=\"\" />\r\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$/ex12\" />\r\n      <option name=\"IS_MODULE_SDK\" value=\"true\" />\r\n      <option name=\"ADD_CONTENT_ROOTS\" value=\"true\" />\r\n      <option name=\"ADD_SOURCE_ROOTS\" value=\"true\" />\r\n      <option name=\"SCRIPT_NAME\" value=\"$PROJECT_DIR$/ex12/example.py\" />\r\n      <option name=\"PARAMETERS\" value=\"\" />\r\n      <option name=\"SHOW_COMMAND_LINE\" value=\"false\" />\r\n      <option name=\"EMULATE_TERMINAL\" value=\"false\" />\r\n      <option name=\"MODULE_MODE\" value=\"false\" />\r\n      <option name=\"REDIRECT_INPUT\" value=\"false\" />\r\n      <option name=\"INPUT_FILE\" value=\"\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"gui\" type=\"PythonConfigurationType\" factoryName=\"Python\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"ex12_utils.py\" />\r\n      <option name=\"INTERPRETER_OPTIONS\" value=\"\" />\r\n      <option name=\"PARENT_ENVS\" value=\"true\" />\r\n      <envs>\r\n        <env name=\"PYTHONUNBUFFERED\" value=\"1\" />\r\n      </envs>\r\n      <option name=\"SDK_HOME\" value=\"D:\\WinPython\\WPy64-3920\\python-3.9.2.amd64\\python.exe\" />\r\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$/ex12\" />\r\n      <option name=\"IS_MODULE_SDK\" value=\"false\" />\r\n      <option name=\"ADD_CONTENT_ROOTS\" value=\"true\" />\r\n      <option name=\"ADD_SOURCE_ROOTS\" value=\"true\" />\r\n      <option name=\"SCRIPT_NAME\" value=\"$PROJECT_DIR$/ex12/gui.py\" />\r\n      <option name=\"PARAMETERS\" value=\"\" />\r\n      <option name=\"SHOW_COMMAND_LINE\" value=\"false\" />\r\n      <option name=\"EMULATE_TERMINAL\" value=\"false\" />\r\n      <option name=\"MODULE_MODE\" value=\"false\" />\r\n      <option name=\"REDIRECT_INPUT\" value=\"false\" />\r\n      <option name=\"INPUT_FILE\" value=\"\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"pytest for ex12_utils.test_does_not_split_cells\" type=\"tests\" factoryName=\"py.test\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"ex12_utils.py\" />\r\n      <option name=\"INTERPRETER_OPTIONS\" value=\"\" />\r\n      <option name=\"PARENT_ENVS\" value=\"true\" />\r\n      <option name=\"SDK_HOME\" value=\"\" />\r\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$/ex12\" />\r\n      <option name=\"IS_MODULE_SDK\" value=\"true\" />\r\n      <option name=\"ADD_CONTENT_ROOTS\" value=\"true\" />\r\n      <option name=\"ADD_SOURCE_ROOTS\" value=\"true\" />\r\n      <option name=\"_new_keywords\" value=\"&quot;&quot;\" />\r\n      <option name=\"_new_parameters\" value=\"&quot;&quot;\" />\r\n      <option name=\"_new_additionalArguments\" value=\"&quot;&quot;\" />\r\n      <option name=\"_new_target\" value=\"&quot;ex12_utils.test_does_not_split_cells&quot;\" />\r\n      <option name=\"_new_targetType\" value=\"&quot;PYTHON&quot;\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <list>\r\n      <item itemvalue=\"Python.check\" />\r\n      <item itemvalue=\"Python.ex12_utils\" />\r\n      <item itemvalue=\"Python.example\" />\r\n      <item itemvalue=\"Python.gui\" />\r\n      <item itemvalue=\"Python tests.pytest for ex12_utils.test_does_not_split_cells\" />\r\n    </list>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"Python.gui\" />\r\n        <item itemvalue=\"Python.ex12_utils\" />\r\n        <item itemvalue=\"Python tests.pytest for ex12_utils.test_does_not_split_cells\" />\r\n        <item itemvalue=\"Python.check\" />\r\n        <item itemvalue=\"Python.example\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"662328d5-2944-4743-ae7c-424f3fd6cbd8\" name=\"Default Changelist\" comment=\"\" />\r\n      <created>1623914387590</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1623914387590</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"GUI\">\r\n      <created>1623914518402</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1623914518402</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"GUI\">\r\n      <created>1624019826303</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1624019826303</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"GUI\">\r\n      <created>1624042764085</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1624042764085</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00004\" summary=\"GUI\">\r\n      <created>1624044285174</created>\r\n      <option name=\"number\" value=\"00004\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1624044285174</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00005\" summary=\"GUI\">\r\n      <created>1624045222578</created>\r\n      <option name=\"number\" value=\"00005\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00005\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1624045222578</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00006\" summary=\"GUI\">\r\n      <created>1624090843284</created>\r\n      <option name=\"number\" value=\"00006\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00006\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1624090843284</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00007\" summary=\"GUI\">\r\n      <created>1624108747655</created>\r\n      <option name=\"number\" value=\"00007\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00007\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1624108747655</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00008\" summary=\"GUI\">\r\n      <created>1624110834517</created>\r\n      <option name=\"number\" value=\"00008\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00008\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1624110834517</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00009\" summary=\"GUI\">\r\n      <created>1624110909483</created>\r\n      <option name=\"number\" value=\"00009\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00009\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1624110909483</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00010\" summary=\"GUI\">\r\n      <created>1624111673488</created>\r\n      <option name=\"number\" value=\"00010\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00010\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1624111673488</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00011\" summary=\"GUI\">\r\n      <created>1624180948666</created>\r\n      <option name=\"number\" value=\"00011\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00011\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1624180948666</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00012\" summary=\"GUI\">\r\n      <created>1624182189422</created>\r\n      <option name=\"number\" value=\"00012\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00012\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1624182189422</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00013\" summary=\"GUI\">\r\n      <created>1624257944960</created>\r\n      <option name=\"number\" value=\"00013\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00013\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1624257944960</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00014\" summary=\"GUI\">\r\n      <created>1624300710582</created>\r\n      <option name=\"number\" value=\"00014\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00014\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1624300710582</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00015\" summary=\"words in end menu improved\">\r\n      <created>1624302217865</created>\r\n      <option name=\"number\" value=\"00015\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00015\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1624302217865</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00016\" summary=\"words in end menu improved\">\r\n      <created>1624302234264</created>\r\n      <option name=\"number\" value=\"00016\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00016\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1624302234264</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00017\" summary=\"REFRESH WORKS!!!\">\r\n      <created>1624352471494</created>\r\n      <option name=\"number\" value=\"00017\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00017\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1624352471494</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00018\" summary=\"REFRESH WORKS!!!\">\r\n      <created>1624352661869</created>\r\n      <option name=\"number\" value=\"00018\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00018\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1624352661869</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00019\" summary=\"מילים לא נשברות ומופיעות במהלך המשחק\">\r\n      <created>1624353937437</created>\r\n      <option name=\"number\" value=\"00019\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00019\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1624353937437</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00020\" summary=\"מילים לא נשברות ומופיעות במהלך המשחק\">\r\n      <created>1624354077390</created>\r\n      <option name=\"number\" value=\"00020\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00020\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1624354077390</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00021\" summary=\"מילים לא נשברות ומופיעות במהלך המשחק\">\r\n      <created>1624354289822</created>\r\n      <option name=\"number\" value=\"00021\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00021\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1624354289822</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00022\" summary=\"מילים לא נשברות ומופיעות במהלך המשחק\">\r\n      <created>1624354508947</created>\r\n      <option name=\"number\" value=\"00022\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00022\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1624354508947</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00023\" summary=\"מילים לא נשברות ומופיעות במהלך המשחק\">\r\n      <created>1624354538325</created>\r\n      <option name=\"number\" value=\"00023\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00023\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1624354538325</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00024\" summary=\"מילים לא נשברות ומופיעות במהלך המשחק\">\r\n      <created>1624354546477</created>\r\n      <option name=\"number\" value=\"00024\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00024\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1624354546477</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"25\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State />\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n    <option name=\"oldMeFiltersMigrated\" value=\"true\" />\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"GUI\" />\r\n    <MESSAGE value=\"words in end menu improved\" />\r\n    <MESSAGE value=\"REFRESH WORKS!!!\" />\r\n    <MESSAGE value=\"מילים לא נשברות ומופיעות במהלך המשחק\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"מילים לא נשברות ומופיעות במהלך המשחק\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 418c60db4ad3412a510703b9c9042c9616aabbfc)
++++ b/.idea/workspace.xml	(date 1624516053793)
+@@ -1,38 +1,50 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
++  <component name="AutoImportSettings">
++    <option name="autoReloadType" value="SELECTIVE" />
++  </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="662328d5-2944-4743-ae7c-424f3fd6cbd8" name="Default Changelist" comment="מילים לא נשברות ומופיעות במהלך המשחק">
++    <list default="true" id="128d851d-baa9-43e6-ad11-e18270a23a4d" name="Default Changelist" comment="">
++      <change afterPath="$PROJECT_DIR$/.idea/ex12_utils.py.iml" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/ex12/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/ex12/gui.py" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/ex12/ex12_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/ex12/ex12_utils.py" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+     <option name="LAST_RESOLUTION" value="IGNORE" />
+-  </component>
+-  <component name="FileTemplateManagerImpl">
+-    <option name="RECENT_TEMPLATES">
+-      <list>
+-        <option value="Python Script" />
+-      </list>
+-    </option>
+   </component>
+   <component name="Git.Settings">
+-    <option name="PUSH_AUTO_UPDATE" value="true" />
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+   </component>
+-  <component name="ProjectId" id="1u4AFy8YJ8iOEKKzhv2URIeiWtl" />
++  <component name="GitSEFilterConfiguration">
++    <file-type-list>
++      <filtered-out-file-type name="LOCAL_BRANCH" />
++      <filtered-out-file-type name="REMOTE_BRANCH" />
++      <filtered-out-file-type name="TAG" />
++      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
++    </file-type-list>
++  </component>
++  <component name="ProjectId" id="1uBKuEvma2O74wTqlOI5IyAwtbV" />
+   <component name="ProjectViewState">
++    <option name="autoscrollToSource" value="true" />
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+   <component name="PropertiesComponent">
+     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../ex4" />
++    <property name="WebServerToolWindowFactoryState" value="false" />
++    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
++    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+   </component>
+   <component name="RunManager" selected="Python.gui">
+-    <configuration name="check" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
++    <configuration name="ex12_utils" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+       <module name="ex12_utils.py" />
+       <option name="INTERPRETER_OPTIONS" value="" />
+       <option name="PARENT_ENVS" value="true" />
+@@ -44,7 +56,8 @@
+       <option name="IS_MODULE_SDK" value="true" />
+       <option name="ADD_CONTENT_ROOTS" value="true" />
+       <option name="ADD_SOURCE_ROOTS" value="true" />
+-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ex12/check.py" />
++      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
++      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ex12/ex12_utils.py" />
+       <option name="PARAMETERS" value="" />
+       <option name="SHOW_COMMAND_LINE" value="false" />
+       <option name="EMULATE_TERMINAL" value="false" />
+@@ -53,7 +66,7 @@
+       <option name="INPUT_FILE" value="" />
+       <method v="2" />
+     </configuration>
+-    <configuration name="ex12_utils" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
++    <configuration name="gui" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+       <module name="ex12_utils.py" />
+       <option name="INTERPRETER_OPTIONS" value="" />
+       <option name="PARENT_ENVS" value="true" />
+@@ -65,7 +78,8 @@
+       <option name="IS_MODULE_SDK" value="true" />
+       <option name="ADD_CONTENT_ROOTS" value="true" />
+       <option name="ADD_SOURCE_ROOTS" value="true" />
+-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ex12/ex12_utils.py" />
++      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
++      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ex12/gui.py" />
+       <option name="PARAMETERS" value="" />
+       <option name="SHOW_COMMAND_LINE" value="false" />
+       <option name="EMULATE_TERMINAL" value="false" />
+@@ -74,7 +88,7 @@
+       <option name="INPUT_FILE" value="" />
+       <method v="2" />
+     </configuration>
+-    <configuration name="example" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
++    <configuration name="scratch" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+       <module name="ex12_utils.py" />
+       <option name="INTERPRETER_OPTIONS" value="" />
+       <option name="PARENT_ENVS" value="true" />
+@@ -82,11 +96,12 @@
+         <env name="PYTHONUNBUFFERED" value="1" />
+       </envs>
+       <option name="SDK_HOME" value="" />
+-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ex12" />
+-      <option name="IS_MODULE_SDK" value="true" />
++      <option name="WORKING_DIRECTORY" value="$APPLICATION_CONFIG_DIR$/scratches" />
++      <option name="IS_MODULE_SDK" value="false" />
+       <option name="ADD_CONTENT_ROOTS" value="true" />
+       <option name="ADD_SOURCE_ROOTS" value="true" />
+-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ex12/example.py" />
++      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
++      <option name="SCRIPT_NAME" value="$APPLICATION_CONFIG_DIR$/scratches/scratch.py" />
+       <option name="PARAMETERS" value="" />
+       <option name="SHOW_COMMAND_LINE" value="false" />
+       <option name="EMULATE_TERMINAL" value="false" />
+@@ -95,19 +110,20 @@
+       <option name="INPUT_FILE" value="" />
+       <method v="2" />
+     </configuration>
+-    <configuration name="gui" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
++    <configuration name="test_ex12_utils" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+       <module name="ex12_utils.py" />
+       <option name="INTERPRETER_OPTIONS" value="" />
+       <option name="PARENT_ENVS" value="true" />
+       <envs>
+         <env name="PYTHONUNBUFFERED" value="1" />
+       </envs>
+-      <option name="SDK_HOME" value="D:\WinPython\WPy64-3920\python-3.9.2.amd64\python.exe" />
++      <option name="SDK_HOME" value="" />
+       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ex12" />
+-      <option name="IS_MODULE_SDK" value="false" />
++      <option name="IS_MODULE_SDK" value="true" />
+       <option name="ADD_CONTENT_ROOTS" value="true" />
+       <option name="ADD_SOURCE_ROOTS" value="true" />
+-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ex12/gui.py" />
++      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
++      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ex12/test_ex12_utils.py" />
+       <option name="PARAMETERS" value="" />
+       <option name="SHOW_COMMAND_LINE" value="false" />
+       <option name="EMULATE_TERMINAL" value="false" />
+@@ -116,218 +132,96 @@
+       <option name="INPUT_FILE" value="" />
+       <method v="2" />
+     </configuration>
+-    <configuration name="pytest for ex12_utils.test_does_not_split_cells" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
++    <configuration name="test_inner" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+       <module name="ex12_utils.py" />
+       <option name="INTERPRETER_OPTIONS" value="" />
+       <option name="PARENT_ENVS" value="true" />
++      <envs>
++        <env name="PYTHONUNBUFFERED" value="1" />
++      </envs>
+       <option name="SDK_HOME" value="" />
+       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ex12" />
+       <option name="IS_MODULE_SDK" value="true" />
+       <option name="ADD_CONTENT_ROOTS" value="true" />
+       <option name="ADD_SOURCE_ROOTS" value="true" />
+-      <option name="_new_keywords" value="&quot;&quot;" />
+-      <option name="_new_parameters" value="&quot;&quot;" />
+-      <option name="_new_additionalArguments" value="&quot;&quot;" />
+-      <option name="_new_target" value="&quot;ex12_utils.test_does_not_split_cells&quot;" />
+-      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
++      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
++      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ex12/test_inner.py" />
++      <option name="PARAMETERS" value="" />
++      <option name="SHOW_COMMAND_LINE" value="false" />
++      <option name="EMULATE_TERMINAL" value="false" />
++      <option name="MODULE_MODE" value="false" />
++      <option name="REDIRECT_INPUT" value="false" />
++      <option name="INPUT_FILE" value="" />
+       <method v="2" />
+     </configuration>
+-    <list>
+-      <item itemvalue="Python.check" />
+-      <item itemvalue="Python.ex12_utils" />
+-      <item itemvalue="Python.example" />
+-      <item itemvalue="Python.gui" />
+-      <item itemvalue="Python tests.pytest for ex12_utils.test_does_not_split_cells" />
+-    </list>
+     <recent_temporary>
+       <list>
+         <item itemvalue="Python.gui" />
++        <item itemvalue="Python.scratch" />
+         <item itemvalue="Python.ex12_utils" />
+-        <item itemvalue="Python tests.pytest for ex12_utils.test_does_not_split_cells" />
+-        <item itemvalue="Python.check" />
+-        <item itemvalue="Python.example" />
++        <item itemvalue="Python.test_inner" />
++        <item itemvalue="Python.test_ex12_utils" />
+       </list>
+     </recent_temporary>
+   </component>
+   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+   <component name="TaskManager">
+     <task active="true" id="Default" summary="Default task">
+-      <changelist id="662328d5-2944-4743-ae7c-424f3fd6cbd8" name="Default Changelist" comment="" />
+-      <created>1623914387590</created>
++      <changelist id="128d851d-baa9-43e6-ad11-e18270a23a4d" name="Default Changelist" comment="" />
++      <created>1624133763177</created>
+       <option name="number" value="Default" />
+       <option name="presentableId" value="Default" />
+-      <updated>1623914387590</updated>
++      <updated>1624133763177</updated>
++      <workItem from="1624133764488" duration="1197000" />
++      <workItem from="1624170887228" duration="3579000" />
++      <workItem from="1624174796880" duration="110000" />
++      <workItem from="1624174919260" duration="3350000" />
++      <workItem from="1624180678006" duration="10197000" />
++      <workItem from="1624276008696" duration="9594000" />
++      <workItem from="1624452392988" duration="511000" />
++      <workItem from="1624458436351" duration="280000" />
++      <workItem from="1624514712411" duration="636000" />
+     </task>
+-    <task id="LOCAL-00001" summary="GUI">
+-      <created>1623914518402</created>
++    <task id="LOCAL-00001" summary="עובר טסטים!">
++      <created>1624174467455</created>
+       <option name="number" value="00001" />
+       <option name="presentableId" value="LOCAL-00001" />
+       <option name="project" value="LOCAL" />
+-      <updated>1623914518402</updated>
++      <updated>1624174467455</updated>
+     </task>
+-    <task id="LOCAL-00002" summary="GUI">
+-      <created>1624019826303</created>
++    <task id="LOCAL-00002" summary="עובר טסטים!">
++      <created>1624174557728</created>
+       <option name="number" value="00002" />
+       <option name="presentableId" value="LOCAL-00002" />
+       <option name="project" value="LOCAL" />
+-      <updated>1624019826303</updated>
++      <updated>1624174557728</updated>
+     </task>
+-    <task id="LOCAL-00003" summary="GUI">
+-      <created>1624042764085</created>
++    <task id="LOCAL-00003" summary="is_valid_path&#10;output fixed">
++      <created>1624191071781</created>
+       <option name="number" value="00003" />
+       <option name="presentableId" value="LOCAL-00003" />
+       <option name="project" value="LOCAL" />
+-      <updated>1624042764085</updated>
++      <updated>1624191071781</updated>
+     </task>
+-    <task id="LOCAL-00004" summary="GUI">
+-      <created>1624044285174</created>
++    <task id="LOCAL-00004" summary="פונקציה אחרונה גמורה.&#10;אין עליה טסטים.&#10;נשאר רק לתעד.">
++      <created>1624215472574</created>
+       <option name="number" value="00004" />
+       <option name="presentableId" value="LOCAL-00004" />
+       <option name="project" value="LOCAL" />
+-      <updated>1624044285174</updated>
++      <updated>1624215472574</updated>
+     </task>
+-    <task id="LOCAL-00005" summary="GUI">
+-      <created>1624045222578</created>
++    <task id="LOCAL-00005" summary="התחלתי לשים קבועים בgui">
++      <created>1624341536811</created>
+       <option name="number" value="00005" />
+       <option name="presentableId" value="LOCAL-00005" />
+       <option name="project" value="LOCAL" />
+-      <updated>1624045222578</updated>
++      <updated>1624341536811</updated>
+     </task>
+-    <task id="LOCAL-00006" summary="GUI">
+-      <created>1624090843284</created>
+-      <option name="number" value="00006" />
+-      <option name="presentableId" value="LOCAL-00006" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1624090843284</updated>
+-    </task>
+-    <task id="LOCAL-00007" summary="GUI">
+-      <created>1624108747655</created>
+-      <option name="number" value="00007" />
+-      <option name="presentableId" value="LOCAL-00007" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1624108747655</updated>
+-    </task>
+-    <task id="LOCAL-00008" summary="GUI">
+-      <created>1624110834517</created>
+-      <option name="number" value="00008" />
+-      <option name="presentableId" value="LOCAL-00008" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1624110834517</updated>
+-    </task>
+-    <task id="LOCAL-00009" summary="GUI">
+-      <created>1624110909483</created>
+-      <option name="number" value="00009" />
+-      <option name="presentableId" value="LOCAL-00009" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1624110909483</updated>
+-    </task>
+-    <task id="LOCAL-00010" summary="GUI">
+-      <created>1624111673488</created>
+-      <option name="number" value="00010" />
+-      <option name="presentableId" value="LOCAL-00010" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1624111673488</updated>
+-    </task>
+-    <task id="LOCAL-00011" summary="GUI">
+-      <created>1624180948666</created>
+-      <option name="number" value="00011" />
+-      <option name="presentableId" value="LOCAL-00011" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1624180948666</updated>
+-    </task>
+-    <task id="LOCAL-00012" summary="GUI">
+-      <created>1624182189422</created>
+-      <option name="number" value="00012" />
+-      <option name="presentableId" value="LOCAL-00012" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1624182189422</updated>
+-    </task>
+-    <task id="LOCAL-00013" summary="GUI">
+-      <created>1624257944960</created>
+-      <option name="number" value="00013" />
+-      <option name="presentableId" value="LOCAL-00013" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1624257944960</updated>
+-    </task>
+-    <task id="LOCAL-00014" summary="GUI">
+-      <created>1624300710582</created>
+-      <option name="number" value="00014" />
+-      <option name="presentableId" value="LOCAL-00014" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1624300710582</updated>
+-    </task>
+-    <task id="LOCAL-00015" summary="words in end menu improved">
+-      <created>1624302217865</created>
+-      <option name="number" value="00015" />
+-      <option name="presentableId" value="LOCAL-00015" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1624302217865</updated>
+-    </task>
+-    <task id="LOCAL-00016" summary="words in end menu improved">
+-      <created>1624302234264</created>
+-      <option name="number" value="00016" />
+-      <option name="presentableId" value="LOCAL-00016" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1624302234264</updated>
+-    </task>
+-    <task id="LOCAL-00017" summary="REFRESH WORKS!!!">
+-      <created>1624352471494</created>
+-      <option name="number" value="00017" />
+-      <option name="presentableId" value="LOCAL-00017" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1624352471494</updated>
+-    </task>
+-    <task id="LOCAL-00018" summary="REFRESH WORKS!!!">
+-      <created>1624352661869</created>
+-      <option name="number" value="00018" />
+-      <option name="presentableId" value="LOCAL-00018" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1624352661869</updated>
+-    </task>
+-    <task id="LOCAL-00019" summary="מילים לא נשברות ומופיעות במהלך המשחק">
+-      <created>1624353937437</created>
+-      <option name="number" value="00019" />
+-      <option name="presentableId" value="LOCAL-00019" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1624353937437</updated>
+-    </task>
+-    <task id="LOCAL-00020" summary="מילים לא נשברות ומופיעות במהלך המשחק">
+-      <created>1624354077390</created>
+-      <option name="number" value="00020" />
+-      <option name="presentableId" value="LOCAL-00020" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1624354077390</updated>
+-    </task>
+-    <task id="LOCAL-00021" summary="מילים לא נשברות ומופיעות במהלך המשחק">
+-      <created>1624354289822</created>
+-      <option name="number" value="00021" />
+-      <option name="presentableId" value="LOCAL-00021" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1624354289822</updated>
+-    </task>
+-    <task id="LOCAL-00022" summary="מילים לא נשברות ומופיעות במהלך המשחק">
+-      <created>1624354508947</created>
+-      <option name="number" value="00022" />
+-      <option name="presentableId" value="LOCAL-00022" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1624354508947</updated>
+-    </task>
+-    <task id="LOCAL-00023" summary="מילים לא נשברות ומופיעות במהלך המשחק">
+-      <created>1624354538325</created>
+-      <option name="number" value="00023" />
+-      <option name="presentableId" value="LOCAL-00023" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1624354538325</updated>
+-    </task>
+-    <task id="LOCAL-00024" summary="מילים לא נשברות ומופיעות במהלך המשחק">
+-      <created>1624354546477</created>
+-      <option name="number" value="00024" />
+-      <option name="presentableId" value="LOCAL-00024" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1624354546477</updated>
+-    </task>
+-    <option name="localTasksCounter" value="25" />
++    <option name="localTasksCounter" value="6" />
+     <servers />
++  </component>
++  <component name="TypeScriptGeneratedFilesManager">
++    <option name="version" value="3" />
+   </component>
+   <component name="Vcs.Log.Tabs.Properties">
+     <option name="TAB_STATES">
+@@ -342,10 +236,17 @@
+     <option name="oldMeFiltersMigrated" value="true" />
+   </component>
+   <component name="VcsManagerConfiguration">
+-    <MESSAGE value="GUI" />
+-    <MESSAGE value="words in end menu improved" />
+-    <MESSAGE value="REFRESH WORKS!!!" />
+-    <MESSAGE value="מילים לא נשברות ומופיעות במהלך המשחק" />
+-    <option name="LAST_COMMIT_MESSAGE" value="מילים לא נשברות ומופיעות במהלך המשחק" />
++    <MESSAGE value="עובר טסטים!" />
++    <MESSAGE value="is_valid_path&#10;output fixed" />
++    <MESSAGE value="פונקציה אחרונה גמורה.&#10;אין עליה טסטים.&#10;נשאר רק לתעד." />
++    <MESSAGE value="התחלתי לשים קבועים בgui" />
++    <option name="LAST_COMMIT_MESSAGE" value="התחלתי לשים קבועים בgui" />
++  </component>
++  <component name="com.intellij.coverage.CoverageDataManagerImpl">
++    <SUITE FILE_PATH="coverage/ex12_utils_py$gui.coverage" NAME="gui Coverage Results" MODIFIED="1624514842919" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ex12" />
++    <SUITE FILE_PATH="coverage/ex12_utils_py$test_inner.coverage" NAME="test_inner Coverage Results" MODIFIED="1624190857711" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ex12" />
++    <SUITE FILE_PATH="coverage/ex12_utils_py$ex12_utils.coverage" NAME="ex12_utils Coverage Results" MODIFIED="1624364498549" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ex12" />
++    <SUITE FILE_PATH="coverage/ex12_utils_py$test_ex12_utils.coverage" NAME="test_ex12_utils Coverage Results" MODIFIED="1624171469877" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ex12" />
++    <SUITE FILE_PATH="coverage/ex12_utils_py$scratch.coverage" NAME="scratch Coverage Results" MODIFIED="1624458716725" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
+   </component>
+ </project>
+\ No newline at end of file
+Index: .idea/inspectionProfiles/Project_Default.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/inspectionProfiles/Project_Default.xml b/.idea/inspectionProfiles/Project_Default.xml
+new file mode 100644
+--- /dev/null	(date 1624364451169)
++++ b/.idea/inspectionProfiles/Project_Default.xml	(date 1624364451169)
+@@ -0,0 +1,17 @@
++<component name="InspectionProjectProfileManager">
++  <profile version="1.0">
++    <option name="myName" value="Project Default" />
++    <inspection_tool class="DuplicatedCode" enabled="true" level="WEAK WARNING" enabled_by_default="true">
++      <Languages>
++        <language minSize="772" name="Python" />
++      </Languages>
++    </inspection_tool>
++    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
++      <option name="ignoredIdentifiers">
++        <list>
++          <option value="twitter.twitter_follow.*" />
++        </list>
++      </option>
++    </inspection_tool>
++  </profile>
++</component>
+\ No newline at end of file
+Index: .idea/ex12_utils.py.iml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/ex12_utils.py.iml b/.idea/ex12_utils.py.iml
+new file mode 100644
+--- /dev/null	(date 1624364451195)
++++ b/.idea/ex12_utils.py.iml	(date 1624364451195)
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<module type="PYTHON_MODULE" version="4">
++  <component name="NewModuleRootManager">
++    <content url="file://$MODULE_DIR$" />
++    <orderEntry type="inheritedJdk" />
++    <orderEntry type="sourceFolder" forTests="false" />
++  </component>
++</module>
+\ No newline at end of file
+Index: .idea/modules.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/modules.xml b/.idea/modules.xml
+new file mode 100644
+--- /dev/null	(date 1624364451210)
++++ b/.idea/modules.xml	(date 1624364451210)
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="ProjectModuleManager">
++    <modules>
++      <module fileurl="file://$PROJECT_DIR$/.idea/ex12_utils.py.iml" filepath="$PROJECT_DIR$/.idea/ex12_utils.py.iml" />
++    </modules>
++  </component>
++</project>
+\ No newline at end of file

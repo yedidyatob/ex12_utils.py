@@ -35,6 +35,10 @@ class StartGame:
     START_GEOMETRY = "400x500"
 
     def __init__(self, root):
+        """
+        start game with root, gives basic grid and dimensions.
+        continues with create_window, which gives the rest of the setup.
+        """
         self.root = root
         # define the size of the window
         root.geometry(self.START_GEOMETRY)
@@ -104,7 +108,9 @@ class MainGame:
 
     def __init__(self, root):
 
-        # initialise all useful variables
+        """
+        initialise all useful variables.
+        """
         self.word = ""
         self.path = []
         self.buttons = dict()
@@ -343,6 +349,10 @@ class EndGame:
     END_GEOMETRY = "600x750"
 
     def __init__(self, root, guessed_words, score):
+        """
+        initialise all useful variables.
+        continues with end_game.
+        """
         self.root = root
         self.guessed_words = guessed_words
         self.score = score
