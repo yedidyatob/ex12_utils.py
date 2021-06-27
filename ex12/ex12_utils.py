@@ -1,9 +1,8 @@
 ###################################
-# Files: ex12_utils_py, gui.py
-# WRITER: Yedidya_Toberman, Yedidyat, 318533197
-#            Illia_FORTUS, illia_fortus, 342851284
+# File: ex12_utils_py
 # EXERCISE: intro2cs ex12 2021
-# SITES I USED: stackoverflow for GUI
+# DESCRIPTION: Utils file with some
+# useful functions
 ###################################
 
 from boggle_board_randomizer import LETTERS, randomize_board

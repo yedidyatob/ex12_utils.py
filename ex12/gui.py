@@ -2,6 +2,8 @@
 # FILE: gui.py
 # EXERCISE: intro2cs2 ex12 2021
 # DESCRIPTION: GUI for Boggle game
+# WEBSITES WE USED: stackoverflow about widgets
+# in python GUI
 ###############################################
 
 
