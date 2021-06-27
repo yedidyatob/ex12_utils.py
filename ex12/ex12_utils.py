@@ -200,7 +200,7 @@ def max_score_paths(board, words):
     :return: list of paths that give maximum score on given board.
     """
     all_paths = {}
-    longest = len(max(words, key=len))
+    longest = len(max(words, key=len)) + 1
     for i in range(1, longest):
         new_paths = {path_to_word(path, board): path for path in
                      find_length_n_paths(i, board, words)}
@@ -226,17 +226,18 @@ def readfile(file):
     f_words.close()
     return lines_dic
 
-# if __name__ == '__main__':
-#     bord = randomize_board(LETTERS)
-#     bord1 = [['D', 'C', 'B', 'A'],
-#              ['G', 'A', 'D', 'E'],
-#              ['T', 'J', 'Y', 'T'],
-#              ['N', 'M', 'F', 'I']]
-#
-#     milon = readfile("boggle_dict.txt")
-#     start = time()
-#     pprint(bord)
-#     print(len(max_score_paths(bord1, milon)))
-#     end = time()
-#
-#     print(end-start)
+if __name__ == '__main__':
+    bord = randomize_board(LETTERS)
+    bord1 = [['A', 'B', 'C', 'D'], ['E', 'F', 'G', 'H'], ['I', 'G', 'K', 'L'], ['M', 'N', 'O', 'P']]
+    melon = ('ABC', 'CDE', 'ABCD')
+
+    milon = readfile("boggle_dict.txt")
+    from time import time
+    from pprint import pprint
+    start = time()
+    pprint(bord1)
+    print(helper_2(4,bord1, melon, WORDS))
+    print(max_score_paths(bord1, melon))
+    end = time()
+
+    print(end-start)

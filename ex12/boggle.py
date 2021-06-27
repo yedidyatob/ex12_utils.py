@@ -1,5 +1,5 @@
 ###############################################
-# FILE: game.py
+# FILE: boggle.py
 # EXERCISE: intro2cs2 ex12 2021
 # DESCRIPTION: Boggle game runner
 ###############################################
